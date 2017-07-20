@@ -23,7 +23,7 @@ public class BasicChassis{
 	//Array of tires
 	protected Vector2[] tirePositions=new Vector2[4];
 	//Array of tirePositions
-	protected int maxTurnAngle=40;
+	protected int maxTurnAngle=20;
 	protected int currentTurn;
 
 
@@ -70,8 +70,8 @@ public class BasicChassis{
 			jointArray[i].enableLimit=true;
 
 			if (tires[i].checkSteered()){
-				jointArray[i].lowerAngle=-40;
-				jointArray[i].upperAngle=40;
+				jointArray[i].lowerAngle=-maxTurnAngle;
+				jointArray[i].upperAngle=maxTurnAngle;
 			}else{
 				jointArray[i].lowerAngle=0;
 				jointArray[i].upperAngle=0;
