@@ -13,26 +13,31 @@ public class Tire{
 	//TODO, implement inputs to control power and steering
 	//TODO attach this to a chassis
 
-	protected float MAXLOAD=45;
+	protected float MAXLOAD=30; //tiwddle with these figures later on
+	protected float currentMax=MAXLOAD; //this will change depending on drifting
+	protected final float DRIFTLOAD=2;
+
 	protected float DRIVEFORCE=75f; //Maximum forward impulse velocity where I=mv
-	protected float BRAKEFORCE=30f;
+	protected float BRAKEFORCE=30f; //Default values given here, can be changed via setForces which is called by the chassis.
 
 	protected float currentLoad;
 
 	public boolean forward;
 	public boolean backward;
 
+	public boolean drifting;
+
 
 	protected final boolean powered, steered;
 	//These two booleans define if the tire is steerable and powered
 
-	protected BasicChassis chassis;
+	protected BasicCar chassis;
 	//Here is the reference to the chassis to which this tire is attached to 
 
 	protected Body tire;
 	//Body of tire
 
-	public Tire(World world, Vector2 location, boolean powered, boolean steered, BasicChassis chassis){
+	public Tire(World world, Vector2 location, boolean powered, boolean steered, BasicCar chassis){
 		BodyDef def=new BodyDef();
 		def.type=BodyDef.BodyType.DynamicBody;
 		def.position.set(location);		
@@ -44,7 +49,7 @@ public class Tire{
 
 		FixtureDef fixtureDef= new FixtureDef();
 		fixtureDef.shape=shape;
-		fixtureDef.density=0.8f;
+		fixtureDef.density=1f;
 
 		Fixture fixture=tire.createFixture(fixtureDef);
 		shape.dispose();
@@ -56,10 +61,11 @@ public class Tire{
 	}
 
 	public void update(){
+		driftu();
 		cancelLateral();
 		updateDrag();
 		takeInputs();
-
+		
 	}
 
 	public Body getTire(){
@@ -72,8 +78,10 @@ public class Tire{
 
 		Vector2 Impulse= getLateralVelocity().scl(-tire.getMass());
 
-		if (Impulse.len()>MAXLOAD){			
-			Impulse=getLateralVelocity().scl((float) (-tire.getMass()*0.4));
+
+		if (Impulse.len()>currentMax){			
+			System.out.println("Skid Alert");
+			Impulse=Impulse.scl(currentMax/Impulse.len());
 		}
 
 		tire.applyLinearImpulse(Impulse, tire.getWorldCenter(), true);
@@ -85,7 +93,7 @@ public class Tire{
 		tire.applyAngularImpulse(-0.1f*tire.getInertia()*tire.getAngularVelocity(), true);
 		//0.1 at the start changes the angular stopping rate 
 
-		float dragForce=getForwardVelocity().len()/5;
+		float dragForce=0.7f*getForwardVelocity().len();
 		//Numero ten at the end will change the slowDown Rate
 
 		tire.applyForceToCenter(getForwardVelocity().scl(-dragForce), true);
@@ -145,12 +153,13 @@ public class Tire{
 	private void power() {	
 		//add case that if velocity is opposite to direction, brakes.
 		//i.e. when speedMatch is -1, moving opposite to direction
+		//TODO fix the stoppy startyness
 		if (speedMatch()<0){
 			tire.applyLinearImpulse(getDirection().scl(tire.getMass()*BRAKEFORCE), tire.getWorldCenter(), true);
 
 		}else{
-			if (powered){
-				tire.applyLinearImpulse(getDirection().scl(tire.getMass()*DRIVEFORCE), tire.getWorldCenter(), true);						
+			if (powered){				
+				tire.applyLinearImpulse(getDirection().scl(tire.getMass()*(DRIVEFORCE-getForwardVelocity().len())), tire.getWorldCenter(), true);						
 			}
 		}
 
@@ -165,7 +174,7 @@ public class Tire{
 
 		}else{
 			if(powered){
-				tire.applyLinearImpulse(getDirection().scl(tire.getMass()*-DRIVEFORCE), tire.getWorldCenter(), true);
+				tire.applyLinearImpulse(getDirection().scl(tire.getMass()*(-DRIVEFORCE+getForwardVelocity().len())), tire.getWorldCenter(), true);
 
 			}
 		}
@@ -178,14 +187,26 @@ public class Tire{
 		}else if(backward){
 			reverse();
 		}
-
-		if (steered){
-			//TODO implement steering once connected to a chassis
-			//TODO make it so unpowered Wheel can still brake
-		}
 	}
 
 	public boolean checkSteered(){
 		return steered;
+	}
+
+	public void setForces(Vector2 driveAndBrake){
+		DRIVEFORCE=driveAndBrake.x;
+		BRAKEFORCE=driveAndBrake.y;		
+		
+	}
+
+	private void driftu(){		
+
+		if(drifting){
+			currentMax=DRIFTLOAD;			
+
+		}else{
+			currentMax=MAXLOAD;
+
+		}
 	}
 }
