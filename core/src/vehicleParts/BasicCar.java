@@ -31,7 +31,7 @@ public class BasicCar{
 	//Vector containing the driving force and braking force of the engine
 
 
-	protected int maxTurnAngle=30;
+	protected int maxTurnAngle=40;
 	//sets maximum lock to lock angle;
 	protected int currentTurn;
 	
@@ -69,8 +69,9 @@ public class BasicCar{
 		Fixture fixture=chassis.createFixture(fixtureDef);
 		shape.dispose();
 		//Rectangle for body has now been constructed
-		fitTires(world);
 		setPositions();
+		fitTires(world);
+		
 
 
 		for (int i=0;i<4;i++){
@@ -94,8 +95,6 @@ public class BasicCar{
 			world.createJoint(jointArray[i]);
 		}
 
-		this.width=width;
-		this.length=length;
 	}
 
 
@@ -104,13 +103,13 @@ public class BasicCar{
 		setDriveAndBrake();
 		
 		for(int i=0;i<2;i++){
-			tires[i]=new Tire(world, new Vector2(0,0), true, false, this); //powered but not steered
+			tires[i]=new Tire(world, tirePositions[i], true, false, this); //powered but not steered
 			tires[i].setForces(driveAndBrake);
 
 		}
 
 		for (int i=2;i<4;i++){
-			tires[i]=new Tire(world, new Vector2(0,0), false, true, this); //steered but not powered
+			tires[i]=new Tire(world, tirePositions[i], false, true, this); //steered but not powered
 			tires[i].setForces(driveAndBrake);
 
 		}
@@ -124,6 +123,9 @@ public class BasicCar{
 	public void setPositions(){
 		//Override based on new tirePositions
 		//sets the positions of the tires
+		
+		//change locations to be relative to the chassis
+				
 		tirePositions[0]=new Vector2(2f,-3f);// Rear
 		tirePositions[1]=new Vector2(-2f,-3f); 
 
@@ -133,13 +135,13 @@ public class BasicCar{
 
 
 	public void update(){
+		
 		for (int i=0;i<4;i++){
 			tires[i].forward=this.forward;
-			tires[i].backward=this.backward;
+			tires[i].backward=this.backward;			
 			tires[i].update();
 		}
-		steer();
-		
+		steer();		
 		
 	}
 
@@ -184,6 +186,12 @@ public class BasicCar{
 			//Slideable backs
 			tires[i].drifting=false;
 		}
+	}
+	
+	public void SetAngle(float angle){
+		//sets angle of tire, used for steering
+		//input is in degrees
+		this.chassis.setTransform(chassis.getWorldCenter(), (float) Math.toRadians(angle));
 	}
 
 

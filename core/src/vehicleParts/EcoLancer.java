@@ -8,12 +8,6 @@ public class EcoLancer extends BasicCar {
 
 	public EcoLancer(World world, Vector2 location) {
 		super(world, location);
-		maxTurnAngle=40;
-	
-
-		
-		
-
 		sprite=new Texture("ecoLancer.png");
 	}
 

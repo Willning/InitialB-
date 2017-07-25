@@ -1,7 +1,7 @@
-package com.mygdx.game;
+package gameLogic;
 
 
-import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
@@ -9,39 +9,41 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import vehicleParts.*; 
+import vehicleParts.*;
+import vehicleParts.CarFactory.CarList; 
 
-public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
+public class ObseleteGame extends Game {
+	//OBSELETE AND ONLY USEFUL FOR MILD DOCUMENTATION PURPOSES
 
-	//TODO  menu
-	//TODO root out the cause of jittery max velocity
+	//TODO make the input controller another class, for the sake of clarity
+	
 
 	final float PPM = 2f; //pixels per meter, might rejig this into a constants class. 
 
-	private SpriteBatch batch;
+	public SpriteBatch batch;
+	public BitmapFont font;
+
+
 	private ShapeRenderer shapeColor;
 	private OrthographicCamera camera;
 	private Box2DDebugRenderer debugCamera;
-	private World world;	
-
+	private World world;
+	private InputController controller;
 	private Texture img; 
 	private Sprite sprite;
-
-	private Texture backgroundTexture;
-
+	private Texture backgroundTexture;	
 	private BasicCar car;
+	
+	private boolean setStraight=false;
 
 
 	@Override
@@ -53,29 +55,33 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		shapeColor=new ShapeRenderer();
 
 		camera= new OrthographicCamera();
-		camera.setToOrtho(false, w/2, h/2);
-		//Set up Camera, used later to track car across the map
-
+		camera.setToOrtho(false, w/2, h/2);		
+		debugCamera=new Box2DDebugRenderer();		
+		camera.zoom=0.3f;
+		//Camera Setup
+		
 		world=new World(new Vector2(0,0), false);
 		//World for Box2d objects to interact
 
-		debugCamera=new Box2DDebugRenderer();
-		Gdx.input.setInputProcessor(this);
-		camera.zoom=0.3f;
 
-		//Make a carFactory to generate cars via menu
-		car=new TownCar(world, new Vector2(180,120));
+		controller=new InputController();
+		Gdx.input.setInputProcessor(controller);
+
+		CarFactory factory=CarFactory.getInstance();
+		factory.setParams(world, new Vector2(180,120));
+		car=factory.makeCar(CarList.TOWNCAR);
+
 		img=car.getCarImage();
-		sprite=new Sprite(img);
-
-		backgroundTexture=new Texture("crudeBackground.png");
+		sprite=new Sprite(img);		
+		
+		backgroundTexture=new Texture("crudeBackground.png");		
 
 	}
 
 	@Override
 	public void render () {
-		world.step(Gdx.graphics.getDeltaTime(), 6, 2);
-
+		//move all of this into GameScreen to get changeable screens.
+		world.step(Gdx.graphics.getDeltaTime(), 6, 2);		
 
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -84,14 +90,11 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		debugCamera.render(world, camera.combined);
 		update();
 
-
-
-
-
 		batch.setProjectionMatrix(camera.combined);
+		
 		batch.begin();
-
 		batch.draw(backgroundTexture, 0, 0, 800, 600);
+		//Remove this later or something
 
 		sprite.setSize(car.getWidth()*PPM, car.getLength()*PPM);
 
@@ -115,7 +118,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 				//fix up positioning, then we are done
 				float x= car.returnTire(i).getTire().getPosition().x-width/2;
 				float y = car.returnTire(i).getTire().getPosition().y-height/2;
-
+				
+				
 				float originX=width/2;
 				float originY=height/2;
 				float degrees=(float) Math.toDegrees(car.returnTire(i).getTire().getAngle());
@@ -128,11 +132,17 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 
 	public void update(){
 		//used in render to handle game logic
-		//Debug camera for 
+		
+		if (!setStraight){
+			//Straighten car out here 
+			car.SetAngle(0);
+			setStraight=true;
+		}
+		
+		useHandler();
 		car.update();
 		
-		basicCamera();
-		//lerpCamera();
+		lerpCamera();
 		camera.update();
 	}
 
@@ -145,16 +155,15 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 	}
 
 
-	
 	public void lerpCamera(){
 		Vector3 cameraPosition=camera.position;
-		
-		cameraPosition.x=camera.position.x+(car.getChassis().getWorldCenter().x-camera.position.x)*0.1f;
-		cameraPosition.y=camera.position.y+(car.getChassis().getWorldCenter().y-camera.position.y)*0.1f;
-		
+
+		cameraPosition.x=camera.position.x+(car.getChassis().getWorldCenter().x-camera.position.x)*0.05f;
+		cameraPosition.y=camera.position.y+(car.getChassis().getWorldCenter().y-camera.position.y)*0.051f;
+
 		camera.position.set(cameraPosition);
-		
-		
+
+
 	}
 
 	@Override 
@@ -162,109 +171,26 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 
 	}
 
-
 	@Override
 	public void dispose () {
 		world.dispose();
 		batch.dispose();		
 		debugCamera.dispose();
-		shapeColor.dispose();
+		shapeColor.dispose();		
 	}
 
+	public void useHandler(){
+		car.forward=controller.up;
+		car.backward=controller.down;
+		car.left=controller.left;
+		car.right=controller.right;
 
-	@Override
-	public boolean keyDown(int keycode){
-		if (keycode==Input.Keys.UP){
-			car.forward=true;
-			car.backward=false;
-		}else if (keycode==Input.Keys.DOWN){
-			car.backward=true;
-			car.forward=false;
-		}
-
-		if(keycode==Input.Keys.LEFT){
-			car.left=true;
-			car.right=false;
-		}else if(keycode==Input.Keys.RIGHT){
-			car.right=true;
-			car.left=false;
-		}
-		
-		if(keycode==Input.Keys.SPACE){
+		if (controller.drift){
 			car.drift();
-		}
-
-		return true;
-	}
-
-	@Override
-	public boolean keyUp(int keycode) {
-		if (keycode==Input.Keys.UP){
-			car.forward=false;
-		}else if (keycode==Input.Keys.DOWN){
-			car.backward=false;
-		}
-		
-		
-		if(keycode==Input.Keys.LEFT){
-			car.left=false;
-		}else if(keycode==Input.Keys.RIGHT){
-			car.right=false;
-		}
-		
-		if(keycode==Input.Keys.SPACE){
+		}else{
 			car.unDrift();
 		}
-		return true;
+
 	}
 
-
-
-
-	@Override
-	public boolean keyTyped(char character) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-
-
-	@Override
-	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		// TODO Auto-generated method stub
-
-		return true;
-	}
-
-
-	@Override
-	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-
-		return false;
-	}
-
-
-
-
-	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-
-	@Override
-	public boolean mouseMoved(int screenX, int screenY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	@Override
-	public boolean scrolled(int amount) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 }

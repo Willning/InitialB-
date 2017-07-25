@@ -40,7 +40,7 @@ public class Tire{
 	public Tire(World world, Vector2 location, boolean powered, boolean steered, BasicCar chassis){
 		BodyDef def=new BodyDef();
 		def.type=BodyDef.BodyType.DynamicBody;
-		def.position.set(location);		
+		def.position.set(chassis.getChassis().getWorldPoint(location));		
 
 		PolygonShape shape=new PolygonShape();
 		shape.setAsBox(0.2f,0.5f); //Tires are all the same size. 
@@ -60,7 +60,7 @@ public class Tire{
 
 	}
 
-	public void update(){
+	public void update(){		
 		driftu();
 		cancelLateral();
 		updateDrag();
@@ -80,7 +80,6 @@ public class Tire{
 
 
 		if (Impulse.len()>currentMax){			
-			System.out.println("Skid Alert");
 			Impulse=Impulse.scl(currentMax/Impulse.len());
 		}
 
@@ -93,7 +92,7 @@ public class Tire{
 		tire.applyAngularImpulse(-0.1f*tire.getInertia()*tire.getAngularVelocity(), true);
 		//0.1 at the start changes the angular stopping rate 
 
-		float dragForce=0.7f*getForwardVelocity().len();
+		float dragForce=0.5f*getForwardVelocity().len();
 		//Numero ten at the end will change the slowDown Rate
 
 		tire.applyForceToCenter(getForwardVelocity().scl(-dragForce), true);
@@ -153,7 +152,7 @@ public class Tire{
 	private void power() {	
 		//add case that if velocity is opposite to direction, brakes.
 		//i.e. when speedMatch is -1, moving opposite to direction
-		//TODO fix the stoppy startyness
+		
 		if (speedMatch()<0){
 			tire.applyLinearImpulse(getDirection().scl(tire.getMass()*BRAKEFORCE), tire.getWorldCenter(), true);
 
@@ -174,7 +173,7 @@ public class Tire{
 
 		}else{
 			if(powered){
-				tire.applyLinearImpulse(getDirection().scl(tire.getMass()*(-DRIVEFORCE+getForwardVelocity().len())), tire.getWorldCenter(), true);
+				tire.applyLinearImpulse(getDirection().scl(tire.getMass()*(-DRIVEFORCE/2.5f+getForwardVelocity().len())), tire.getWorldCenter(), true);
 
 			}
 		}

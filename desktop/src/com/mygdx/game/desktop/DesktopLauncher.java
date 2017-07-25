@@ -3,7 +3,7 @@ package com.mygdx.game.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
-import gameLogic.MainGame;
+import gameLogic.ObseleteGame;
 import gameLogic.GameManager;
 
 public class DesktopLauncher {
