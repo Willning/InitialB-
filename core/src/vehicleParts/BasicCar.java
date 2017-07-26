@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 public class BasicCar{
 	//This class will contain and construct all the requisites of a car, i.e Engine+tires
-	//TODO add a weighted average position
+	//TODO flick of forward force from wheels upon turning to reduce understeer
 
 
 	protected float width=2;
@@ -31,7 +31,7 @@ public class BasicCar{
 	//Vector containing the driving force and braking force of the engine
 
 
-	protected int maxTurnAngle=40;
+	protected int maxTurnAngle=35;
 	//sets maximum lock to lock angle;
 	protected int currentTurn;
 	

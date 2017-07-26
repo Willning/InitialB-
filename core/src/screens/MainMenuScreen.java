@@ -16,16 +16,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import gameLogic.GameManager;
+import vehicleParts.CarFactory.CarList;
 
-public class MainMenuScreen implements Screen{
+public class MainMenuScreen extends AbstractScreen{
 
 	//This class is used to represent the splash screen displayed upon starting the game
 
 	final Game game;	
 	TextButton playButton;	
-	Stage stage;
-	Skin skin;
-
 
 	GameManager superGame;
 
@@ -40,44 +38,22 @@ public class MainMenuScreen implements Screen{
 		//set the Skin to be something
 		createBasicSkin();
 
-		playButton=new TextButton("Play", skin);
-		playButton.setPosition((int) Gdx.graphics.getWidth()/2-playButton.getWidth()+50, (int) Gdx.graphics.getHeight()/2-200);
+		playButton=new TextButton("Start Game", skin);
+		playButton.setPosition((int) Gdx.graphics.getWidth()/2-playButton.getWidth()+50, (int) Gdx.graphics.getHeight()/2-100);
 
 		stage.addActor(playButton);
 
 		playButton.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y){
-				game.setScreen(new GameScreen(game));
+				game.setScreen(new CarSelectScreen(game));
 				dispose();
 			}
 		});
 
-
 	}
 
-	public void createBasicSkin(){
-		skin=new Skin();
-		BitmapFont font =new BitmapFont();
-		skin.add("default", font);
 
-		Pixmap pixmap= new Pixmap((int) Gdx.graphics.getWidth()/8, (int) Gdx.graphics.getHeight()/8, Pixmap.Format.RGB888 );
-		pixmap.setColor(Color.WHITE);
-		pixmap.fill();
-		skin.add("background", new Texture(pixmap));
-
-		TextButton.TextButtonStyle textButtonStyle=new TextButton.TextButtonStyle();
-
-		textButtonStyle.font = skin.getFont("default");
-
-		textButtonStyle.up = skin.newDrawable("background", Color.RED);
-		textButtonStyle.down = skin.newDrawable("background", Color.FIREBRICK);
-		textButtonStyle.checked = skin.newDrawable("background", Color.FIREBRICK);
-		textButtonStyle.over = skin.newDrawable("background", Color.MAROON);
-
-
-		skin.add("default", textButtonStyle);
-	}
 
 	@Override
 	public void show() {
@@ -126,10 +102,12 @@ public class MainMenuScreen implements Screen{
 		// TODO Auto-generated method stub
 
 	}
-
+	
 	@Override
 	public void dispose() {
-
-
+		stage.dispose();
+		skin.dispose();	
+		
 	}
+
 }

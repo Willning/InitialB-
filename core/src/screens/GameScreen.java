@@ -17,6 +17,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 
+import gameLogic.GameManager;
 import gameLogic.InputController;
 import vehicleParts.BasicCar;
 import vehicleParts.CarFactory;
@@ -32,7 +33,7 @@ public class GameScreen implements Screen {
 
 	public SpriteBatch batch;
 	public BitmapFont font;
-	
+
 	private ShapeRenderer shapeColor;
 	private OrthographicCamera camera;
 	private Box2DDebugRenderer debugCamera;
@@ -41,15 +42,17 @@ public class GameScreen implements Screen {
 	private Texture img; 
 	private Sprite sprite;	
 	private BasicCar car;
-	
+
 	private Texture backgroundTexture;	
 
 	private boolean setStraight=false;
 
-	public GameScreen(final Game game){
+	public GameScreen(final Game game, CarList setCar){
 		this.game=game;
 		
-		batch = new SpriteBatch();
+		GameManager superGame =(GameManager)game;
+
+		batch = superGame.batcher;
 		shapeColor=new ShapeRenderer();
 
 		float w=Gdx.graphics.getWidth();
@@ -70,14 +73,15 @@ public class GameScreen implements Screen {
 		//setup the controller
 
 		CarFactory factory=CarFactory.getInstance();
-		factory.setParams(world, new Vector2(180,120)); 
-		car=factory.makeCar(CarList.BONDA_BIVIC);
+		factory.setParams(world, new Vector2(180,120));
+		
+		this.car=factory.makeCar(setCar);
 		//load the car from the factory, the input will be controlled by the main menu later on 
 
 		img=car.getCarImage();
 		sprite=new Sprite(img);
-		
-		backgroundTexture=new Texture("crudeBackground.png");
+
+		backgroundTexture=new Texture("crudeBackGround.png");
 		//load this in with a track factory later
 	}
 
@@ -94,16 +98,31 @@ public class GameScreen implements Screen {
 		//Blank out the screen
 
 		//push off all rendering duties to a World Renderer class later on;
-				
+
 		update();
-		
+
 		debugCamera.render(world, camera.combined);
 		batch.setProjectionMatrix(camera.combined);
 		shapeColor.setProjectionMatrix(camera.combined);
-		
-		
+
+		//render order should be render background, render tires, render car.		
+		renderBackground();
+		renderTires();
+		renderCar();
+
+	}
+	
+	public void renderBackground(){
 		batch.begin();
-		batch.draw(backgroundTexture, 0, 0, 800, 600);
+		batch.draw(backgroundTexture, 0, 0);
+		
+		batch.end();
+	}
+
+
+	public void renderCar(){
+		batch.begin();
+		//This is going to be a method, renderCar();
 		
 		sprite.setSize(car.getWidth()*PPM, car.getLength()*PPM);
 
@@ -111,9 +130,10 @@ public class GameScreen implements Screen {
 		sprite.setPosition(car.getChassis().getPosition().x-sprite.getWidth()/2, car.getChassis().getPosition().y-sprite.getHeight()/2);
 		sprite.setRotation((float) (Math.toDegrees(car.getChassis().getAngle())));
 		sprite.draw(batch);
-		batch.end();
-				
-		
+		batch.end();	
+	}
+
+	public void renderTires(){
 		shapeColor.begin(ShapeType.Filled);
 		shapeColor.setColor(new Color(0f,0f,0f, 0f));		
 		for (int i=0;i<4;i++){
@@ -124,8 +144,8 @@ public class GameScreen implements Screen {
 				//fix up positioning, then we are done
 				float x= car.returnTire(i).getTire().getPosition().x-width/2;				
 				float y = car.returnTire(i).getTire().getPosition().y-height/2;
-				
-				
+
+
 				float originX=width/2;
 				float originY=height/2;				
 				float degrees=(float) Math.toDegrees(car.returnTire(i).getTire().getAngle());
@@ -138,20 +158,21 @@ public class GameScreen implements Screen {
 
 	}
 
+
 	public void update(){
 		//used in render to handle game logic
-				
+
 		if (!setStraight){
 			//Straighten car out here, not 100% neccesary but maybe use for resetting?
 			car.SetAngle(0);
 			setStraight=true;
 		}
-		
+
 		world.step(Gdx.graphics.getDeltaTime(), 6, 2);
 		useHandler();
 		car.update();
 		lerpCamera();
-		
+
 	}
 
 	public void lerpCamera(){
@@ -177,10 +198,10 @@ public class GameScreen implements Screen {
 		car.backward=controller.down;
 		car.left=controller.left;
 		car.right=controller.right;
-		
+
 		if (controller.drift){
 			car.drift();			
-			
+
 		}else{
 			car.unDrift();
 		}
