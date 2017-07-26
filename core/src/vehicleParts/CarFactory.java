@@ -9,7 +9,7 @@ public class CarFactory {
 	private static CarFactory instance=null;
 
 	public enum CarList{
-		TOWNCAR, ECOLANCER, BONDA_BIVIC;
+		TOWNCAR, ECOLANCER, BIVIC;
 	}
 
 	private static World world;
@@ -39,7 +39,7 @@ public class CarFactory {
 			return new TownCar(world, location);
 		}else if (car==CarList.ECOLANCER){
 			return new EcoLancer(world,location);
-		}else if (car==CarList.BONDA_BIVIC){
+		}else if (car==CarList.BIVIC){
 			return new BondaBivic(world,location);
 		}
 		return null;

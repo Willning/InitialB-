@@ -6,6 +6,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
@@ -25,18 +26,21 @@ public class CarSelectScreen extends AbstractScreen {
 
 	final Game game;
 
-	TextButton backButton;
-	TextButton playButton;
+	private TextButton backButton;
+	private TextButton playButton;
+	//Really bad structuring but it works for now.
 
 	private Table table;
-
-	private CarList car; 
+	private CarList car;
+	private BitmapFont font;
 
 	GameManager superGame;
 
 	public CarSelectScreen(final Game racerGame){
 		this.game=racerGame;
 		superGame =(GameManager)game;
+		font= superGame.font;
+
 
 		stage=new Stage();
 
@@ -45,14 +49,14 @@ public class CarSelectScreen extends AbstractScreen {
 		createCarSelectSkin();
 
 		table=new Table();		
-		table.setPosition((int) Gdx.graphics.getWidth()/2, 400);
+		table.setPosition((int) Gdx.graphics.getWidth()/2, 350);
 
 
 		HorizontalGroup group=new HorizontalGroup();
 		TextButton buttonOne=new TextButton("Town Car", carSelectSkin);
 		TextButton buttonTwo=new TextButton ("EcoLancer", carSelectSkin);		
-		TextButton buttonThree=new TextButton("Bonda Bivic", carSelectSkin);
-		
+		TextButton buttonThree=new TextButton("Bivic", carSelectSkin);
+
 		//Setup the buttons.
 
 		buttonOne.addListener(new ClickListener(){ 
@@ -73,10 +77,9 @@ public class CarSelectScreen extends AbstractScreen {
 		buttonThree.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y){
-				car=CarList.BONDA_BIVIC;
+				car=CarList.BIVIC;
 			}
 		});
-
 
 
 		group.addActor(buttonOne);
@@ -86,6 +89,13 @@ public class CarSelectScreen extends AbstractScreen {
 		table.add(group);
 
 		stage.addActor(table);
+
+		makePlayAndBack();
+
+	}
+
+	public void makePlayAndBack(){
+		//Add play and back button
 
 		backButton=new TextButton("Back", skin);
 		backButton.setPosition(10, (int) Gdx.graphics.getHeight()/2-220);		
@@ -114,6 +124,17 @@ public class CarSelectScreen extends AbstractScreen {
 
 		stage.addActor(backButton);
 		stage.addActor(playButton);
+	}
+
+	public void displayCurrentChoice(){
+
+		superGame.batcher.begin();
+		if (car!=null){
+			font.draw(superGame.batcher, "Car: " + car.toString(), 500, 200);
+		}else{
+			font.draw(superGame.batcher, "Car: None Chosen", 500, 200);
+		}				
+		superGame.batcher.end();
 
 	}
 
@@ -130,6 +151,8 @@ public class CarSelectScreen extends AbstractScreen {
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		displayCurrentChoice();
 
 		stage.act();
 		stage.draw();
@@ -165,6 +188,7 @@ public class CarSelectScreen extends AbstractScreen {
 		stage.dispose();
 		skin.dispose();
 		carSelectSkin.dispose();
+		font.dispose();
 
 
 	}
