@@ -16,6 +16,7 @@ public class MainMenuScreen extends AbstractScreen{
 
 	final Game game;	
 	TextButton playButton;	
+	TextButton exitButton;
 
 	GameManager superGame;
 
@@ -31,9 +32,13 @@ public class MainMenuScreen extends AbstractScreen{
 		createBasicSkin();
 
 		playButton=new TextButton("Start Game", skin);
-		playButton.setPosition((int) Gdx.graphics.getWidth()/2-playButton.getWidth()+50, (int) Gdx.graphics.getHeight()/2-100);
+		playButton.setPosition((int) Gdx.graphics.getWidth()/2-playButton.getWidth()+50, (int) Gdx.graphics.getHeight()/2-130);
+		
+		exitButton=new TextButton("Exit", skin);
+		exitButton.setPosition((int) Gdx.graphics.getWidth()/2-playButton.getWidth()+50, (int) Gdx.graphics.getHeight()/2-200);
 
 		stage.addActor(playButton);
+		stage.addActor(exitButton);
 
 		playButton.addListener(new ClickListener(){
 			@Override
@@ -42,9 +47,16 @@ public class MainMenuScreen extends AbstractScreen{
 				dispose();
 			}
 		});
+		
+		exitButton.addListener(new ClickListener(){
+			@Override
+			public void clicked(InputEvent event, float x, float y){
+				dispose();
+				Gdx.app.exit();				
+			}
+		});
 
 	}
-
 
 
 	@Override

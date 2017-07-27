@@ -13,12 +13,14 @@ public class Tire{
 	//TODO, implement inputs to control power and steering
 	//TODO attach this to a chassis
 
-	protected float MAXLOAD=30; //tiwddle with these figures later on
+	protected float MAXLOAD=12; //tiwddle with these figures later on
 	protected float currentMax=MAXLOAD; //this will change depending on drifting
-	protected final float DRIFTLOAD=2;
+	protected final float DRIFTLOAD=5;
 
 	protected float DRIVEFORCE=75f; //Maximum forward impulse velocity where I=mv
-	protected float BRAKEFORCE=30f; //Default values given here, can be changed via setForces which is called by the chassis.
+	protected float MAXSPEED=30f; //Default values given here, can be changed via setForces which is called by the chassis.
+
+	//Maybe rejig drive and brake to be forces instead of impulses
 
 	protected float currentLoad;
 
@@ -65,7 +67,7 @@ public class Tire{
 		cancelLateral();
 		updateDrag();
 		takeInputs();
-		
+
 	}
 
 	public Body getTire(){
@@ -77,7 +79,6 @@ public class Tire{
 		//Now use a maximum Impulse so we can get a bit of skidding. 
 
 		Vector2 Impulse= getLateralVelocity().scl(-tire.getMass());
-
 
 		if (Impulse.len()>currentMax){			
 			Impulse=Impulse.scl(currentMax/Impulse.len());
@@ -101,17 +102,19 @@ public class Tire{
 	}
 
 	private Vector2 getDirection(){
-
 		Vector2 direction=new Vector2(0,1);
 		return direction.rotate((float)Math.toDegrees(this.tire.getAngle()));
+	}
+	private Vector2 getForwardVelocity(){
+		//used here to get forward motion of the tire
+		Vector2 forwardDirection=getDirection();
+		Vector2 linVelocity=tire.getLinearVelocity();
 
+		Vector2 forwardVelocity=forwardDirection.scl(linVelocity.dot(forwardDirection)/forwardDirection.dot(forwardDirection));
+
+		return forwardVelocity;
 	}
 
-	public void SetAngle(float angle){
-		//sets angle of tire, used for steering
-		//input is in degrees
-		this.tire.setTransform(tire.getWorldCenter(), (float) Math.toRadians(angle));
-	}
 
 	private Vector2 getLateralVelocity(){
 		//vector project velocity onto the normal vector
@@ -124,43 +127,24 @@ public class Tire{
 		return lateralVelocity;
 	}
 
-	private Vector2 getForwardVelocity(){
-		//used here to get forward motion of the tire
-		Vector2 forwardDirection=getDirection();
-		Vector2 linVelocity=tire.getLinearVelocity();
-
-		Vector2 forwardVelocity=forwardDirection.scl(linVelocity.dot(forwardDirection)/forwardDirection.dot(forwardDirection));
-
-		return forwardVelocity;
-
-	}
-
-	private int speedMatch(){		
-		//this is used in braking to find out if the direction of movement is the same as the direction of pointing
-		//1 for same direction, 0 for still, -1 for opposite direction
-		if (getForwardVelocity().equals(new Vector2(0,0))){
-			return 0;
-		}else if (getDirection().equals(getForwardVelocity().nor())){
-			return 1;
-		}else if(!getDirection().equals(getForwardVelocity().nor())){
-			return -1;
-		}
-		return 0;
+	public void SetAngle(float angle){
+		//sets angle of tire, used for steering
+		//input is in degrees
+		this.tire.setTransform(tire.getWorldCenter(), (float) Math.toRadians(angle));
 	}
 
 
 	private void power() {	
 		//add case that if velocity is opposite to direction, brakes.
 		//i.e. when speedMatch is -1, moving opposite to direction
-		
-		if (speedMatch()<0){
-			tire.applyLinearImpulse(getDirection().scl(tire.getMass()*BRAKEFORCE), tire.getWorldCenter(), true);
 
-		}else{
-			if (powered){				
-				tire.applyLinearImpulse(getDirection().scl(tire.getMass()*(DRIVEFORCE-getForwardVelocity().len())), tire.getWorldCenter(), true);						
+		if (powered){
+			if (chassis.getForwardVelocity().len()<MAXSPEED){
+				//Stop power if maxspeed is exceeded
+				tire.applyForceToCenter(getDirection().scl(DRIVEFORCE),true);
 			}
 		}
+
 
 	}
 
@@ -168,15 +152,12 @@ public class Tire{
 		//fix this so it applies an actual braking to stop, pauses a bit then reverses
 		//brake if speedMatch is 1, i.e. moving forward, opposite of reversing
 
-		if (speedMatch()>0){
-			tire.applyLinearImpulse(getDirection().scl(tire.getMass()*-BRAKEFORCE), tire.getWorldCenter(), true);
-
-		}else{
-			if(powered){
-				tire.applyLinearImpulse(getDirection().scl(tire.getMass()*(-DRIVEFORCE/2.5f+getForwardVelocity().len())), tire.getWorldCenter(), true);
-
+		if(powered){
+			if (chassis.getForwardVelocity().len()<MAXSPEED){
+				tire.applyForceToCenter(getDirection().scl(-DRIVEFORCE/2),true);
 			}
 		}
+
 
 	}
 
@@ -188,14 +169,25 @@ public class Tire{
 		}
 	}
 
+	public void removeUnderSteer(){
+		//helper class that will power the unpowered steering wheels of car to get rid of the horrendous percieved understeer;
+		if (steered&&!powered){
+			if (forward)
+				tire.applyLinearImpulse(getDirection().scl(10*getForwardVelocity().len()/50), tire.getWorldCenter(), true);
+		}else if (backward){
+			tire.applyLinearImpulse(getDirection().scl(-10*getForwardVelocity().len()/50), tire.getWorldCenter(), true);
+		}
+
+	}
+
 	public boolean checkSteered(){
 		return steered;
 	}
 
 	public void setForces(Vector2 driveAndBrake){
 		DRIVEFORCE=driveAndBrake.x;
-		BRAKEFORCE=driveAndBrake.y;		
-		
+		MAXSPEED=driveAndBrake.y;		
+
 	}
 
 	private void driftu(){		

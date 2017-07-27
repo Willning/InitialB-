@@ -24,7 +24,8 @@ import vehicleParts.CarFactory;
 import vehicleParts.CarFactory.CarList;
 
 public class GameScreen implements Screen {
-	//TODO offload rendering to another class for better ENCAPSULATION
+	//TODO add another class responsible for an overlay UI Speedometer etc.
+	//Add torque curves and perhaps even shifting?
 
 	private final Game game;
 
@@ -42,10 +43,13 @@ public class GameScreen implements Screen {
 	private Texture img; 
 	private Sprite sprite;	
 	private BasicCar car;
-
-	private Texture backgroundTexture;	
+	
+	private Texture backgroundTexture;
+	//Not neccesary here
 
 	private boolean setStraight=false;
+	
+	private float currentZoom=0.3f;
 
 	public GameScreen(final Game game, CarList setCar){
 		this.game=game;
@@ -61,27 +65,26 @@ public class GameScreen implements Screen {
 		camera= new OrthographicCamera();
 		camera.setToOrtho(false, w/2, h/2);		
 		debugCamera=new Box2DDebugRenderer();		
-		camera.zoom=0.3f;
+		camera.zoom=currentZoom;
 		//setup the camera;
 
 		world=new World(new Vector2(0,0), false);
-		//World for Box2d objects to interact
-
-
+		
 		controller=new InputController();
 		Gdx.input.setInputProcessor(controller);
 		//setup the controller
 
 		CarFactory factory=CarFactory.getInstance();
-		factory.setParams(world, new Vector2(180,120));
-		
+		factory.setParams(world, new Vector2(20,20));		
 		this.car=factory.makeCar(setCar);
-		//load the car from the factory, the input will be controlled by the main menu later on 
+		//load the car from the factory, the input will be controlled by through the constructor which will take in a carList enum value from the choose car menu
 
 		img=car.getCarImage();
+		//This may be changed to an asset class that will load all assets at the start
+		
 		sprite=new Sprite(img);
 
-		backgroundTexture=new Texture("crudeBackGround.png");
+		backgroundTexture=new Texture("crapTrack.png");
 		//load this in with a track factory later
 	}
 
@@ -125,7 +128,7 @@ public class GameScreen implements Screen {
 		//This is going to be a method, renderCar();
 		
 		sprite.setSize(car.getWidth()*PPM, car.getLength()*PPM);
-
+		
 		sprite.setOrigin(sprite.getWidth()/2, sprite.getHeight()/2);
 		sprite.setPosition(car.getChassis().getPosition().x-sprite.getWidth()/2, car.getChassis().getPosition().y-sprite.getHeight()/2);
 		sprite.setRotation((float) (Math.toDegrees(car.getChassis().getAngle())));
@@ -177,10 +180,23 @@ public class GameScreen implements Screen {
 
 	public void lerpCamera(){
 		Vector3 cameraPosition=camera.position;
+		float MaxZoom=0.4f;		
+		float MinZoom=0.3f;				
 
-		cameraPosition.x=camera.position.x+(car.getChassis().getWorldCenter().x-camera.position.x)*0.05f;
-		cameraPosition.y=camera.position.y+(car.getChassis().getWorldCenter().y-camera.position.y)*0.051f;
+		cameraPosition.x=camera.position.x+(car.getChassis().getWorldCenter().x-camera.position.x)*0.08f;
+		cameraPosition.y=camera.position.y+(car.getChassis().getWorldCenter().y-camera.position.y)*0.08f;
 		camera.position.set(cameraPosition);
+		
+		if (car.getChassis().getLinearVelocity().len()>20){
+			if (currentZoom<MaxZoom){
+				currentZoom+=0.0001f*car.getChassis().getLinearVelocity().len();
+			}				
+		}else{
+			if(currentZoom>MinZoom){
+				currentZoom-=0.0004f;
+			}
+		}		
+		camera.zoom=currentZoom;
 		camera.update();
 
 	}
@@ -200,10 +216,13 @@ public class GameScreen implements Screen {
 		car.right=controller.right;
 
 		if (controller.drift){
-			car.drift();			
-
+			car.drift();
 		}else{
 			car.unDrift();
+		}
+		
+		if (controller.exit){
+			game.setScreen(new MainMenuScreen(game));
 		}
 
 	}

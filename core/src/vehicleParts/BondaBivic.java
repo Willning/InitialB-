@@ -35,7 +35,7 @@ public class BondaBivic extends BasicCar {
 	
 	@Override
 	protected void setDriveAndBrake(){
-		driveAndBrake=new Vector2(90,120);
+		driveAndBrake=new Vector2(1100,40);
 	}
 	
 	public void setPositions(){

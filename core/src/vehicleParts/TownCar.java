@@ -10,14 +10,14 @@ public class TownCar extends BasicCar{
 	public TownCar(World world, Vector2 location) {
 		super(world, location);
 		sprite=new Texture("townCar.png");
-	
-		
+		maxTurnAngle=40;
+			
 	}
 	
 	
 	@Override
 	protected void setDriveAndBrake(){
-		driveAndBrake=new Vector2(180,120);
+		driveAndBrake=new Vector2(1200,40);
 	}
 
 

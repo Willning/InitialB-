@@ -3,7 +3,6 @@ package com.mygdx.game.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
-import gameLogic.ObseleteGame;
 import gameLogic.GameManager;
 
 public class DesktopLauncher {
@@ -13,6 +12,7 @@ public class DesktopLauncher {
 		config.height=480;
 		config.backgroundFPS=30;
 		config.foregroundFPS=40;
+		config.resizable=false;
 		new LwjglApplication(new GameManager(), config);
 	}
 }

@@ -11,6 +11,8 @@ public class InputController implements InputProcessor {
 	public boolean down;
 
 	public boolean drift;
+	
+	public boolean exit;
 
 	@Override
 	public boolean keyDown(int keycode) {
@@ -36,6 +38,9 @@ public class InputController implements InputProcessor {
 		case Keys.SPACE:
 			drift=true;
 			keyDown=true;
+			break;
+		case Keys.ESCAPE:
+			exit=true;
 		}
 		return keyDown;
 	}
@@ -63,8 +68,10 @@ public class InputController implements InputProcessor {
 			break;
 		case Keys.SPACE:
 			drift=false;
-			keyUp=true;			
+			keyUp=true;
+
 		}
+
 		return keyUp;
 	}
 

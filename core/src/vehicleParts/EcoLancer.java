@@ -9,6 +9,7 @@ public class EcoLancer extends BasicCar {
 	public EcoLancer(World world, Vector2 location) {
 		super(world, location);
 		sprite=new Texture("ecoLancer.png");
+		maxTurnAngle=35;
 	}
 
 	@Override
@@ -30,7 +31,8 @@ public class EcoLancer extends BasicCar {
 	
 	@Override
 	protected void setDriveAndBrake(){
-		driveAndBrake=new Vector2(100,120);
+		driveAndBrake=new Vector2(900,50);
+		//Keep in mind 4wd
 	}
 
 

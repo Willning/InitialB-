@@ -31,11 +31,11 @@ public class BasicCar{
 	//Vector containing the driving force and braking force of the engine
 
 
-	protected int maxTurnAngle=35;
-	//sets maximum lock to lock angle;
+	protected int maxTurnAngle=40;
+	//sets maximum lock to lock angle, by defaultits 40;
 	protected int currentTurn;
-	
-	
+
+
 
 	public boolean forward;
 	public boolean backward;
@@ -49,9 +49,9 @@ public class BasicCar{
 	//Using this body, things will be attached to it
 
 	public BasicCar (World world, Vector2 location){
-		
+
 		driveAndBrake=new Vector2(75,50);
-		
+
 		BodyDef def= new BodyDef();
 		def.type=BodyDef.BodyType.DynamicBody;		
 		def.position.set(location);
@@ -71,7 +71,7 @@ public class BasicCar{
 		//Rectangle for body has now been constructed
 		setPositions();
 		fitTires(world);
-		
+
 
 
 		for (int i=0;i<4;i++){
@@ -101,7 +101,7 @@ public class BasicCar{
 	public void fitTires(World world){
 		//OverRide based on drive configuration
 		setDriveAndBrake();
-		
+
 		for(int i=0;i<2;i++){
 			tires[i]=new Tire(world, tirePositions[i], true, false, this); //powered but not steered
 			tires[i].setForces(driveAndBrake);
@@ -115,7 +115,7 @@ public class BasicCar{
 		}
 
 	}
-	
+
 	protected void setDriveAndBrake(){
 		driveAndBrake=new Vector2(50,50);
 	}
@@ -123,9 +123,9 @@ public class BasicCar{
 	public void setPositions(){
 		//Override based on new tirePositions
 		//sets the positions of the tires
-		
+
 		//change locations to be relative to the chassis
-				
+
 		tirePositions[0]=new Vector2(2f,-3f);// Rear
 		tirePositions[1]=new Vector2(-2f,-3f); 
 
@@ -134,7 +134,8 @@ public class BasicCar{
 	}
 
 
-	public void update(){
+	public void update(){		
+		System.out.println(Math.round(3.6*getForwardVelocity().len()));
 		
 		for (int i=0;i<4;i++){
 			tires[i].forward=this.forward;
@@ -142,7 +143,7 @@ public class BasicCar{
 			tires[i].update();
 		}
 		steer();		
-		
+
 	}
 
 	public void steer(){	
@@ -151,12 +152,14 @@ public class BasicCar{
 
 		for (int i=0;i<4;i++){
 			if(tires[i].checkSteered()){
-
 				if(left||right){
+					tires[i].removeUnderSteer();
 					if (currentTurn<maxTurnAngle){
 						currentTurn+=5;
 						//increment by 5 degrees per tick, smooths out steering
 					}
+					//maybe have to add a bit of power if speedmatch to get rid of horrendous understeer;
+
 				}
 				if (left){
 					tires[i].SetAngle(angle+currentTurn);
@@ -172,7 +175,7 @@ public class BasicCar{
 	}
 
 	public void drift(){
-		
+
 		for (int i=0;i<2;i++){
 			//Slideable backs
 			tires[i].drifting=true;
@@ -180,20 +183,34 @@ public class BasicCar{
 		//TODO takes the two rear tires and lowers max load creating for mean slides;
 
 	}
-	
+
 	public void unDrift(){
 		for (int i=0;i<2;i++){
 			//Slideable backs
 			tires[i].drifting=false;
 		}
 	}
-	
+
 	public void SetAngle(float angle){
 		//sets angle of tire, used for steering
 		//input is in degrees
 		this.chassis.setTransform(chassis.getWorldCenter(), (float) Math.toRadians(angle));
 	}
+	
+	private Vector2 getDirection(){
+		Vector2 direction=new Vector2(0,1);
+		return direction.rotate((float)Math.toDegrees(this.chassis.getAngle()));
+	}
+	
+	public Vector2 getForwardVelocity(){
+		//used here to get forward motion of the car, used in speedometer and tire speed limits
+		Vector2 forwardDirection=getDirection();
+		Vector2 linVelocity=chassis.getLinearVelocity();
 
+		Vector2 forwardVelocity=forwardDirection.scl(linVelocity.dot(forwardDirection)/forwardDirection.dot(forwardDirection));
+
+		return forwardVelocity;
+	}
 
 
 	public Body getChassis(){
