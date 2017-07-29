@@ -15,7 +15,7 @@ public class Tire{
 
 	protected float MAXLOAD=12; //tiwddle with these figures later on
 	protected float currentMax=MAXLOAD; //this will change depending on drifting
-	protected final float DRIFTLOAD=5;
+	protected final float DRIFTLOAD=2;
 
 	protected float DRIVEFORCE=75f; //Maximum forward impulse velocity where I=mv
 	protected float MAXSPEED=30f; //Default values given here, can be changed via setForces which is called by the chassis.
@@ -172,10 +172,12 @@ public class Tire{
 	public void removeUnderSteer(){
 		//helper class that will power the unpowered steering wheels of car to get rid of the horrendous percieved understeer;
 		if (steered&&!powered){
-			if (forward)
-				tire.applyLinearImpulse(getDirection().scl(10*getForwardVelocity().len()/50), tire.getWorldCenter(), true);
-		}else if (backward){
-			tire.applyLinearImpulse(getDirection().scl(-10*getForwardVelocity().len()/50), tire.getWorldCenter(), true);
+			if (chassis.getForwardVelocity().len()<MAXSPEED){
+				if (forward)
+					tire.applyLinearImpulse(getDirection().scl(2*getForwardVelocity().len()/50), tire.getWorldCenter(), true);
+			}else if (backward){
+				tire.applyLinearImpulse(getDirection().scl(-2*getForwardVelocity().len()/50), tire.getWorldCenter(), true);
+			}
 		}
 
 	}

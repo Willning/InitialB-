@@ -31,7 +31,7 @@ public class EcoLancer extends BasicCar {
 	
 	@Override
 	protected void setDriveAndBrake(){
-		driveAndBrake=new Vector2(900,50);
+		driveAndBrake=new Vector2(1000,50);
 		//Keep in mind 4wd
 	}
 

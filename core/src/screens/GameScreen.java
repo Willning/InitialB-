@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import gameLogic.GameManager;
 import gameLogic.InputController;
+import overlays.Overlay;
 import vehicleParts.BasicCar;
 import vehicleParts.CarFactory;
 import vehicleParts.CarFactory.CarList;
@@ -43,13 +44,14 @@ public class GameScreen implements Screen {
 	private Texture img; 
 	private Sprite sprite;	
 	private BasicCar car;
+	private Overlay overlay;
 	
 	private Texture backgroundTexture;
 	//Not neccesary here
 
 	private boolean setStraight=false;
 	
-	private float currentZoom=0.3f;
+	private float currentZoom=0.15f;
 
 	public GameScreen(final Game game, CarList setCar){
 		this.game=game;
@@ -78,6 +80,8 @@ public class GameScreen implements Screen {
 		factory.setParams(world, new Vector2(20,20));		
 		this.car=factory.makeCar(setCar);
 		//load the car from the factory, the input will be controlled by through the constructor which will take in a carList enum value from the choose car menu
+		
+		overlay=new Overlay(car, batch);
 
 		img=car.getCarImage();
 		//This may be changed to an asset class that will load all assets at the start
@@ -112,6 +116,7 @@ public class GameScreen implements Screen {
 		renderBackground();
 		renderTires();
 		renderCar();
+		overlay.update();
 
 	}
 	
@@ -148,7 +153,6 @@ public class GameScreen implements Screen {
 				float x= car.returnTire(i).getTire().getPosition().x-width/2;				
 				float y = car.returnTire(i).getTire().getPosition().y-height/2;
 
-
 				float originX=width/2;
 				float originY=height/2;				
 				float degrees=(float) Math.toDegrees(car.returnTire(i).getTire().getAngle());
@@ -180,8 +184,8 @@ public class GameScreen implements Screen {
 
 	public void lerpCamera(){
 		Vector3 cameraPosition=camera.position;
-		float MaxZoom=0.4f;		
-		float MinZoom=0.3f;				
+		float MaxZoom=0.25f;		
+		float MinZoom=0.15f;				
 
 		cameraPosition.x=camera.position.x+(car.getChassis().getWorldCenter().x-camera.position.x)*0.08f;
 		cameraPosition.y=camera.position.y+(car.getChassis().getWorldCenter().y-camera.position.y)*0.08f;
@@ -193,7 +197,7 @@ public class GameScreen implements Screen {
 			}				
 		}else{
 			if(currentZoom>MinZoom){
-				currentZoom-=0.0004f;
+				currentZoom-=0.0008f;
 			}
 		}		
 		camera.zoom=currentZoom;

@@ -13,8 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 public class BasicCar{
 	//This class will contain and construct all the requisites of a car, i.e Engine+tires
-	//TODO flick of forward force from wheels upon turning to reduce understeer
-
+	
+	//TODO add input logging and replaying, probably add a new controller.
 
 	protected float width=2;
 	protected float length=4.5f;	
@@ -35,7 +35,7 @@ public class BasicCar{
 	//sets maximum lock to lock angle, by defaultits 40;
 	protected int currentTurn;
 
-
+	
 
 	public boolean forward;
 	public boolean backward;
@@ -71,7 +71,6 @@ public class BasicCar{
 		//Rectangle for body has now been constructed
 		setPositions();
 		fitTires(world);
-
 
 
 		for (int i=0;i<4;i++){
@@ -135,7 +134,7 @@ public class BasicCar{
 
 
 	public void update(){		
-		System.out.println(Math.round(3.6*getForwardVelocity().len()));
+		System.out.println();
 		
 		for (int i=0;i<4;i++){
 			tires[i].forward=this.forward;
