@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 
-public class EcoLancer extends BasicCar {
+public class EcoLancer extends FourWheelDriveCar {
 
 	public EcoLancer(World world, Vector2 location) {
 		super(world, location);
@@ -12,28 +12,18 @@ public class EcoLancer extends BasicCar {
 		maxTurnAngle=35;
 	}
 
-	@Override
-	public void fitTires(World world){
-		//Four wheel drive now
-		setDriveAndBrake();	
-
-		for(int i=0;i<2;i++){
-			tires[i]=new SportsTire(world, new Vector2(0,0), true, false, this); //powered but not steered
-			tires[i].setForces(driveAndBrake);
-
-		}
-
-		for (int i=2;i<4;i++){
-			tires[i]=new SportsTire(world, new Vector2(0,0), true, true, this); //steered and powered
-			tires[i].setForces(driveAndBrake);
-		}
+	public void setDriveForce(){
+		driveForce=1500f;
 	}
 	
-	@Override
-	protected void setDriveAndBrake(){
-		driveAndBrake=new Vector2(1000,50);
-		//Keep in mind 4wd
+	public void setMaxSpeed(){
+		maxSpeed=50f;
 	}
+	
+	public void setMaxGrip(){
+		maxGrip=18f;
+	}
+	
 
 
 }

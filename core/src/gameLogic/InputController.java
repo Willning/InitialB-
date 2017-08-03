@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 
 public class InputController implements InputProcessor {
+	//TODO implement keylogging to make ghosts
 
 	public boolean left;
 	public boolean right;

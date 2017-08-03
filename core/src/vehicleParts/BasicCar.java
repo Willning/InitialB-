@@ -9,12 +9,12 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 public class BasicCar{
 	//This class will contain and construct all the requisites of a car, i.e Engine+tires
-	
+
 	//TODO add input logging and replaying, probably add a new controller.
+	//TODO add an engine class maybe so that power comes on and off progressively.
 
 	protected float width=2;
 	protected float length=4.5f;	
@@ -27,14 +27,14 @@ public class BasicCar{
 	protected Vector2[] tirePositions=new Vector2[4];
 	//Array of tirePositions
 
-	protected Vector2 driveAndBrake;
-	//Vector containing the driving force and braking force of the engine
-
-
 	protected int maxTurnAngle=40;
 	//sets maximum lock to lock angle, by defaultits 40;
 	protected int currentTurn;
-
+	
+	protected float driveForce;
+	protected float maxSpeed;
+	protected float maxGrip;
+	
 	
 
 	public boolean forward;
@@ -46,11 +46,10 @@ public class BasicCar{
 
 	protected Body chassis;	
 	RevoluteJointDef[] jointArray=new RevoluteJointDef[4];
+	
 	//Using this body, things will be attached to it
 
 	public BasicCar (World world, Vector2 location){
-
-		driveAndBrake=new Vector2(75,50);
 
 		BodyDef def= new BodyDef();
 		def.type=BodyDef.BodyType.DynamicBody;		
@@ -99,25 +98,22 @@ public class BasicCar{
 
 	public void fitTires(World world){
 		//OverRide based on drive configuration
-		setDriveAndBrake();
 
 		for(int i=0;i<2;i++){
 			tires[i]=new Tire(world, tirePositions[i], true, false, this); //powered but not steered
-			tires[i].setForces(driveAndBrake);
-
+			tires[i].setDriveForce(1000f);
+			tires[i].setMaxSpeed(40f);
 		}
 
 		for (int i=2;i<4;i++){
 			tires[i]=new Tire(world, tirePositions[i], false, true, this); //steered but not powered
-			tires[i].setForces(driveAndBrake);
-
+			tires[i].setDriveForce(200f);
+			tires[i].setMaxSpeed(40f);
 		}
 
 	}
-
-	protected void setDriveAndBrake(){
-		driveAndBrake=new Vector2(50,50);
-	}
+	
+	
 
 	public void setPositions(){
 		//Override based on new tirePositions
@@ -134,12 +130,11 @@ public class BasicCar{
 
 
 	public void update(){		
-		System.out.println();
 		
 		for (int i=0;i<4;i++){
 			tires[i].forward=this.forward;
 			tires[i].backward=this.backward;			
-			tires[i].update();
+			tires[i].update();			
 		}
 		steer();		
 
@@ -151,8 +146,7 @@ public class BasicCar{
 
 		for (int i=0;i<4;i++){
 			if(tires[i].checkSteered()){
-				if(left||right){
-					tires[i].removeUnderSteer();
+				if(left||right){	
 					if (currentTurn<maxTurnAngle){
 						currentTurn+=5;
 						//increment by 5 degrees per tick, smooths out steering
@@ -195,12 +189,12 @@ public class BasicCar{
 		//input is in degrees
 		this.chassis.setTransform(chassis.getWorldCenter(), (float) Math.toRadians(angle));
 	}
-	
+
 	private Vector2 getDirection(){
 		Vector2 direction=new Vector2(0,1);
 		return direction.rotate((float)Math.toDegrees(this.chassis.getAngle()));
 	}
-	
+
 	public Vector2 getForwardVelocity(){
 		//used here to get forward motion of the car, used in speedometer and tire speed limits
 		Vector2 forwardDirection=getDirection();
@@ -233,6 +227,18 @@ public class BasicCar{
 
 	public Texture getCarImage(){
 		return sprite;
+	}
+	
+	public void setDriveForce(){
+		//templates that will be changed to set properties
+	}
+	
+	public void setMaxSpeed(){
+		//templates that will be changed to set properties
+	}
+	
+	public void setMaxGrip(){
+		//override to set the grip of each tire.
 	}
 
 

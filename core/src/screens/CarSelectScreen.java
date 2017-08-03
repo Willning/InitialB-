@@ -1,25 +1,17 @@
 package screens;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import gameLogic.GameManager;
-import gameLogic.InputController;
-import vehicleParts.CarFactory;
 import vehicleParts.CarFactory.CarList;
 
 public class CarSelectScreen extends AbstractScreen {
@@ -56,7 +48,7 @@ public class CarSelectScreen extends AbstractScreen {
 		TextButton buttonOne=new TextButton("Town Car", carSelectSkin);
 		TextButton buttonTwo=new TextButton ("EcoLancer", carSelectSkin);		
 		TextButton buttonThree=new TextButton("Bivic", carSelectSkin);
-
+		TextButton buttonFour=new TextButton("Yambo", carSelectSkin);
 		//Setup the buttons.
 
 		buttonOne.addListener(new ClickListener(){ 
@@ -80,11 +72,19 @@ public class CarSelectScreen extends AbstractScreen {
 				car=CarList.BIVIC;
 			}
 		});
+		
+		buttonFour.addListener(new ClickListener(){
+			@Override
+			public void clicked(InputEvent event, float x, float y){
+				car=CarList.YAMBO;
+			}
+		});
 
 
 		group.addActor(buttonOne);
 		group.addActor(buttonTwo);
 		group.addActor(buttonThree);
+		group.addActor(buttonFour);
 
 		table.add(group);
 

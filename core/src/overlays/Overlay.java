@@ -18,7 +18,7 @@ import vehicleParts.BasicCar;
 
 public class Overlay implements Disposable {
 	//Overlay used to contain the hud, things like the speedo
-	//TODO add an image of a speedometer with the text being in the bottom area. 
+	//TODO add a timing overlay
 
 	BasicCar car; 
 	//this will be measured for speed for the speedometer
@@ -70,7 +70,7 @@ public class Overlay implements Disposable {
 	
 	public void update(){
 		
-		speed=(int) (3.6*car.getForwardVelocity().len());
+		speed=(int) (4.5*car.getForwardVelocity().len());
 		
 				
 		speedText.setText(String.format("%03d" +" km/h", speed));

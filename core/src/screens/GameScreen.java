@@ -17,9 +17,11 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 
+import gameLogic.CarRenderer;
 import gameLogic.GameManager;
 import gameLogic.InputController;
 import overlays.Overlay;
+import trackStuff.BasicTrack;
 import vehicleParts.BasicCar;
 import vehicleParts.CarFactory;
 import vehicleParts.CarFactory.CarList;
@@ -41,10 +43,12 @@ public class GameScreen implements Screen {
 	private Box2DDebugRenderer debugCamera;
 	private World world;
 	private InputController controller;
-	private Texture img; 
-	private Sprite sprite;	
 	private BasicCar car;
 	private Overlay overlay;
+	private BasicTrack track;
+	
+	private CarRenderer renderer;
+	//Trialing something here
 	
 	private Texture backgroundTexture;
 	//Not neccesary here
@@ -77,19 +81,15 @@ public class GameScreen implements Screen {
 		//setup the controller
 
 		CarFactory factory=CarFactory.getInstance();
-		factory.setParams(world, new Vector2(20,20));		
+		factory.setParams(world, new Vector2(40,20));		
 		this.car=factory.makeCar(setCar);
 		//load the car from the factory, the input will be controlled by through the constructor which will take in a carList enum value from the choose car menu
 		
-		overlay=new Overlay(car, batch);
-
-		img=car.getCarImage();
-		//This may be changed to an asset class that will load all assets at the start
+		overlay=new Overlay(car, batch);		
+		renderer=new CarRenderer(car,batch);
+		//Rendering of cars has now been pushed off onto another class, this means that we can potentially render two or more cars 
 		
-		sprite=new Sprite(img);
-
-		backgroundTexture=new Texture("crapTrack.png");
-		//load this in with a track factory later
+		track=new BasicTrack(world);
 	}
 
 	@Override
@@ -114,56 +114,19 @@ public class GameScreen implements Screen {
 
 		//render order should be render background, render tires, render car.		
 		renderBackground();
-		renderTires();
-		renderCar();
+		
+		renderer.renderCar(camera, car);
+		
+		//renderer gets passed in the camera position and the 
+		
 		overlay.update();
 
 	}
 	
 	public void renderBackground(){
-		batch.begin();
-		batch.draw(backgroundTexture, 0, 0);
-		
-		batch.end();
+		track.render(camera);
 	}
 
-
-	public void renderCar(){
-		batch.begin();
-		//This is going to be a method, renderCar();
-		
-		sprite.setSize(car.getWidth()*PPM, car.getLength()*PPM);
-		
-		sprite.setOrigin(sprite.getWidth()/2, sprite.getHeight()/2);
-		sprite.setPosition(car.getChassis().getPosition().x-sprite.getWidth()/2, car.getChassis().getPosition().y-sprite.getHeight()/2);
-		sprite.setRotation((float) (Math.toDegrees(car.getChassis().getAngle())));
-		sprite.draw(batch);
-		batch.end();	
-	}
-
-	public void renderTires(){
-		shapeColor.begin(ShapeType.Filled);
-		shapeColor.setColor(new Color(0f,0f,0f, 0f));		
-		for (int i=0;i<4;i++){
-			if (car.returnTire(i)!=null){
-				float width=0.5f;
-				float height=1f;
-
-				//fix up positioning, then we are done
-				float x= car.returnTire(i).getTire().getPosition().x-width/2;				
-				float y = car.returnTire(i).getTire().getPosition().y-height/2;
-
-				float originX=width/2;
-				float originY=height/2;				
-				float degrees=(float) Math.toDegrees(car.returnTire(i).getTire().getAngle());
-
-				shapeColor.rect(x, y, originX, originY, width, height, 1, 1, degrees);
-			}
-		}		
-		shapeColor.end();               		
-
-
-	}
 
 
 	public void update(){
@@ -184,7 +147,7 @@ public class GameScreen implements Screen {
 
 	public void lerpCamera(){
 		Vector3 cameraPosition=camera.position;
-		float MaxZoom=0.25f;		
+		float MaxZoom=0.28f;		
 		float MinZoom=0.15f;				
 
 		cameraPosition.x=camera.position.x+(car.getChassis().getWorldCenter().x-camera.position.x)*0.08f;

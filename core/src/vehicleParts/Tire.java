@@ -20,6 +20,8 @@ public class Tire{
 	protected float DRIVEFORCE=75f; //Maximum forward impulse velocity where I=mv
 	protected float MAXSPEED=30f; //Default values given here, can be changed via setForces which is called by the chassis.
 
+	private float currentPower;
+
 	//Maybe rejig drive and brake to be forces instead of impulses
 
 	protected float currentLoad;
@@ -93,7 +95,7 @@ public class Tire{
 		tire.applyAngularImpulse(-0.1f*tire.getInertia()*tire.getAngularVelocity(), true);
 		//0.1 at the start changes the angular stopping rate 
 
-		float dragForce=0.5f*getForwardVelocity().len();
+		float dragForce=0.3f*getForwardVelocity().len();
 		//Numero ten at the end will change the slowDown Rate
 
 		tire.applyForceToCenter(getForwardVelocity().scl(-dragForce), true);
@@ -141,7 +143,10 @@ public class Tire{
 		if (powered){
 			if (chassis.getForwardVelocity().len()<MAXSPEED){
 				//Stop power if maxspeed is exceeded
-				tire.applyForceToCenter(getDirection().scl(DRIVEFORCE),true);
+				if(currentPower<DRIVEFORCE){
+					currentPower+=DRIVEFORCE/4f;
+				}
+				tire.applyForceToCenter(getDirection().scl(currentPower),true);
 			}
 		}
 
@@ -151,45 +156,38 @@ public class Tire{
 	private void reverse(){
 		//fix this so it applies an actual braking to stop, pauses a bit then reverses
 		//brake if speedMatch is 1, i.e. moving forward, opposite of reversing
-
 		if(powered){
 			if (chassis.getForwardVelocity().len()<MAXSPEED){
-				tire.applyForceToCenter(getDirection().scl(-DRIVEFORCE/2),true);
+				tire.applyForceToCenter(getDirection().scl(-DRIVEFORCE/8),true);
 			}
 		}
-
-
 	}
+
 
 	public void takeInputs(){		
 		if (forward){
 			power();			
 		}else if(backward){
 			reverse();
-		}
-	}
-
-	public void removeUnderSteer(){
-		//helper class that will power the unpowered steering wheels of car to get rid of the horrendous percieved understeer;
-		if (steered&&!powered){
-			if (chassis.getForwardVelocity().len()<MAXSPEED){
-				if (forward)
-					tire.applyLinearImpulse(getDirection().scl(2*getForwardVelocity().len()/50), tire.getWorldCenter(), true);
-			}else if (backward){
-				tire.applyLinearImpulse(getDirection().scl(-2*getForwardVelocity().len()/50), tire.getWorldCenter(), true);
+		}else{
+			if (currentPower>0){
+				currentPower-=DRIVEFORCE/4f;
 			}
 		}
-
 	}
+
 
 	public boolean checkSteered(){
 		return steered;
 	}
 
-	public void setForces(Vector2 driveAndBrake){
-		DRIVEFORCE=driveAndBrake.x;
-		MAXSPEED=driveAndBrake.y;		
+	public void setDriveForce(float driveForce){
+		DRIVEFORCE=driveForce;
 
+	}
+
+	public void setMaxSpeed(float maxSpeed){
+		MAXSPEED=maxSpeed;
 	}
 
 	private void driftu(){		
