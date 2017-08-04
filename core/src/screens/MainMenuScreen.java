@@ -14,7 +14,7 @@ public class MainMenuScreen extends AbstractScreen{
 
 	//This class is used to represent the splash screen displayed upon starting the game
 
-	final Game game;	
+	private final Game game;	
 	TextButton playButton;	
 	TextButton exitButton;
 

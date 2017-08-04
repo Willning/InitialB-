@@ -20,6 +20,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import gameLogic.CarRenderer;
 import gameLogic.GameManager;
 import gameLogic.InputController;
+import gameLogic.ListenerClass;
 import overlays.Overlay;
 import trackStuff.BasicTrack;
 import vehicleParts.BasicCar;
@@ -31,7 +32,6 @@ public class GameScreen implements Screen {
 	//Add torque curves and perhaps even shifting?
 
 	private final Game game;
-
 
 	final float PPM = 2f; //pixels per meter, might rejig this into a constants class. 
 
@@ -73,8 +73,11 @@ public class GameScreen implements Screen {
 		debugCamera=new Box2DDebugRenderer();		
 		camera.zoom=currentZoom;
 		//setup the camera;
+		
+		ListenerClass listener=new ListenerClass();
 
 		world=new World(new Vector2(0,0), false);
+		world.setContactListener(listener);
 		
 		controller=new InputController();
 		Gdx.input.setInputProcessor(controller);
@@ -84,12 +87,13 @@ public class GameScreen implements Screen {
 		factory.setParams(world, new Vector2(40,20));		
 		this.car=factory.makeCar(setCar);
 		//load the car from the factory, the input will be controlled by through the constructor which will take in a carList enum value from the choose car menu
+		track=new BasicTrack(world);
 		
-		overlay=new Overlay(car, batch);		
+		overlay=new Overlay(car, batch,track);		
 		renderer=new CarRenderer(car,batch);
 		//Rendering of cars has now been pushed off onto another class, this means that we can potentially render two or more cars 
 		
-		track=new BasicTrack(world);
+		
 	}
 
 	@Override
@@ -100,7 +104,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClearColor(96/255f, 142/255f, 66/255f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		//Blank out the screen
 

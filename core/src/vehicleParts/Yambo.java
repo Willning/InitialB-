@@ -11,7 +11,7 @@ public class Yambo extends FourWheelDriveCar{
 		length=5f;
 		width=2f;		
 		sprite=new Texture("yambo.png");
-		maxTurnAngle=30;
+		maxTurnAngle=25;
 	}
 	
 	@Override
