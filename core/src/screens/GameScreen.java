@@ -21,7 +21,7 @@ import gameLogic.CarRenderer;
 import gameLogic.GameManager;
 import gameLogic.InputController;
 import gameLogic.ListenerClass;
-import overlays.Overlay;
+import overlays.Speedometer;
 import trackStuff.BasicTrack;
 import vehicleParts.BasicCar;
 import vehicleParts.CarFactory;
@@ -44,22 +44,21 @@ public class GameScreen implements Screen {
 	private World world;
 	private InputController controller;
 	private BasicCar car;
-	private Overlay overlay;
+	private Speedometer overlay;
 	private BasicTrack track;
-	
+	ListenerClass listener;
+
 	private CarRenderer renderer;
-	//Trialing something here
-	
-	private Texture backgroundTexture;
-	//Not neccesary here
+
+
 
 	private boolean setStraight=false;
-	
+
 	private float currentZoom=0.15f;
 
 	public GameScreen(final Game game, CarList setCar){
 		this.game=game;
-		
+
 		GameManager superGame =(GameManager)game;
 
 		batch = superGame.batcher;
@@ -73,12 +72,14 @@ public class GameScreen implements Screen {
 		debugCamera=new Box2DDebugRenderer();		
 		camera.zoom=currentZoom;
 		//setup the camera;
-		
-		ListenerClass listener=new ListenerClass();
+
+		listener=new ListenerClass();
 
 		world=new World(new Vector2(0,0), false);
 		world.setContactListener(listener);
-		
+		//Set up a contact listener for the world.
+
+
 		controller=new InputController();
 		Gdx.input.setInputProcessor(controller);
 		//setup the controller
@@ -88,12 +89,12 @@ public class GameScreen implements Screen {
 		this.car=factory.makeCar(setCar);
 		//load the car from the factory, the input will be controlled by through the constructor which will take in a carList enum value from the choose car menu
 		track=new BasicTrack(world);
-		
-		overlay=new Overlay(car, batch,track);		
+
+		overlay=new Speedometer(car, batch,track);		
 		renderer=new CarRenderer(car,batch);
 		//Rendering of cars has now been pushed off onto another class, this means that we can potentially render two or more cars 
-		
-		
+
+
 	}
 
 	@Override
@@ -118,34 +119,40 @@ public class GameScreen implements Screen {
 
 		//render order should be render background, render tires, render car.		
 		renderBackground();
-		
+
 		renderer.renderCar(camera, car);
-		
-		//renderer gets passed in the camera position and the 
-		
-		overlay.update();
+
+		renderOverlay();
+
 
 	}
-	
+
 	public void renderBackground(){
 		track.render(camera);
 	}
-
+	
+	public void renderOverlay(){
+		if(listener.checkGameOver()){
+			overlay.gameOver();
+		}
+		overlay.update();
+	}
 
 
 	public void update(){
 		//used in render to handle game logic
-
 		if (!setStraight){
 			//Straighten car out here, not 100% neccesary but maybe use for resetting?
 			car.SetAngle(0);
 			setStraight=true;
-		}
+		}		
+
 
 		world.step(Gdx.graphics.getDeltaTime(), 6, 2);
 		useHandler();
 		car.update();
-		lerpCamera();
+		lerpCamera();		
+
 
 	}
 
@@ -157,7 +164,7 @@ public class GameScreen implements Screen {
 		cameraPosition.x=camera.position.x+(car.getChassis().getWorldCenter().x-camera.position.x)*0.08f;
 		cameraPosition.y=camera.position.y+(car.getChassis().getWorldCenter().y-camera.position.y)*0.08f;
 		camera.position.set(cameraPosition);
-		
+
 		if (car.getChassis().getLinearVelocity().len()>20){
 			if (currentZoom<MaxZoom){
 				currentZoom+=0.0001f*car.getChassis().getLinearVelocity().len();
@@ -191,7 +198,7 @@ public class GameScreen implements Screen {
 		}else{
 			car.unDrift();
 		}
-		
+
 		if (controller.exit){
 			game.setScreen(new MainMenuScreen(game));
 		}
@@ -222,6 +229,8 @@ public class GameScreen implements Screen {
 		// TODO Auto-generated method stub
 
 	}
+	
+
 
 
 }

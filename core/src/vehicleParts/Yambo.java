@@ -19,8 +19,8 @@ public class Yambo extends FourWheelDriveCar{
 		//Override based on new tirePositions
 		//sets the positions of the tires
 		//Closer widthwise and lengthwise, do later
-		tirePositions[0]=new Vector2(2f,-2.5f);// Rear
-		tirePositions[1]=new Vector2(-2f,-2.5f); 
+		tirePositions[0]=new Vector2(2f,-2.9f);// Rear
+		tirePositions[1]=new Vector2(-2f,-2.9f); 
 
 		tirePositions[2]=new Vector2(2f,2.8f); //Fronts
 		tirePositions[3]=new Vector2(-2f,2.8f);

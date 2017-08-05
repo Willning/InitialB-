@@ -54,13 +54,14 @@ public class BasicCar{
 		BodyDef def= new BodyDef();
 		def.type=BodyDef.BodyType.DynamicBody;		
 		def.position.set(location);
-
+		
+		
 		PolygonShape shape=new PolygonShape();
 		shape.setAsBox(width,length);
 		//probably in future use stored length and width
 
-
 		this.chassis=world.createBody(def);
+		chassis.setUserData("car");
 
 		FixtureDef fixtureDef= new FixtureDef();
 		fixtureDef.shape=shape;

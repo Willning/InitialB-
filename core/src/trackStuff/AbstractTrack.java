@@ -54,11 +54,11 @@ public abstract class AbstractTrack {
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.StaticBody;				
 				Body body = world.createBody(bd);
-				
+
 				FixtureDef fixtureDef = new FixtureDef();
 				fixtureDef.shape=shape;
 				fixtureDef.friction=5f;
-				
+
 				body.createFixture(fixtureDef);
 
 				bodies.add(body);
@@ -78,11 +78,10 @@ public abstract class AbstractTrack {
 
 				FixtureDef fixtureDef = new FixtureDef();
 				fixtureDef.shape=shape;
-				fixtureDef.filter.categoryBits=0x0;
 				fixtureDef.isSensor=true;
 
 				body.createFixture(fixtureDef);
-				//Rig up start line and finish lin
+				
 
 				startAndFinish.add(body);
 
