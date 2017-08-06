@@ -22,14 +22,16 @@ import gameLogic.GameManager;
 import gameLogic.InputController;
 import gameLogic.ListenerClass;
 import overlays.Speedometer;
+import overlays.StarterLight;
 import trackStuff.BasicTrack;
 import vehicleParts.BasicCar;
 import vehicleParts.CarFactory;
 import vehicleParts.CarFactory.CarList;
 
 public class GameScreen implements Screen {
-	//TODO add another class responsible for an overlay UI Speedometer etc.
-	//Add torque curves and perhaps even shifting?
+	//TODO add a startlight over right at the start.
+	//Cars cannot take input during the starting period.
+	//Timer stays on 0 during starting period
 
 	private final Game game;
 
@@ -45,13 +47,14 @@ public class GameScreen implements Screen {
 	private InputController controller;
 	private BasicCar car;
 	private Speedometer overlay;
+	private StarterLight starter;
 	private BasicTrack track;
 	ListenerClass listener;
 
 	private CarRenderer renderer;
 
 
-
+	private boolean timerStart=false;
 	private boolean setStraight=false;
 
 	private float currentZoom=0.15f;
@@ -90,7 +93,8 @@ public class GameScreen implements Screen {
 		//load the car from the factory, the input will be controlled by through the constructor which will take in a carList enum value from the choose car menu
 		track=new BasicTrack(world);
 
-		overlay=new Speedometer(car, batch,track);		
+		overlay=new Speedometer(car, batch,track);
+		starter=new StarterLight(batch);
 		renderer=new CarRenderer(car,batch);
 		//Rendering of cars has now been pushed off onto another class, this means that we can potentially render two or more cars 
 
@@ -111,7 +115,9 @@ public class GameScreen implements Screen {
 
 		//push off all rendering duties to a World Renderer class later on;
 
+
 		update();
+
 
 		debugCamera.render(world, camera.combined);
 		batch.setProjectionMatrix(camera.combined);
@@ -124,13 +130,12 @@ public class GameScreen implements Screen {
 
 		renderOverlay();
 
-
 	}
 
 	public void renderBackground(){
 		track.render(camera);
 	}
-	
+
 	public void renderOverlay(){
 		if(listener.checkGameOver()){
 			overlay.gameOver();
@@ -140,18 +145,31 @@ public class GameScreen implements Screen {
 
 
 	public void update(){
+		
+		starter.tick();
 		//used in render to handle game logic
 		if (!setStraight){
 			//Straighten car out here, not 100% neccesary but maybe use for resetting?
 			car.SetAngle(0);
 			setStraight=true;
-		}		
+		}
+
+		if (!timerStart&&starter.isStarted()){
+			//link this to gameStart later
+			overlay.startTimer();
+			timerStart=true;
+		}
 
 
 		world.step(Gdx.graphics.getDeltaTime(), 6, 2);
-		useHandler();
+		lerpCamera();
+		
+		if(starter.isStarted()){		
+			useHandler();
+		}
+
 		car.update();
-		lerpCamera();		
+
 
 
 	}
@@ -229,7 +247,7 @@ public class GameScreen implements Screen {
 		// TODO Auto-generated method stub
 
 	}
-	
+
 
 
 

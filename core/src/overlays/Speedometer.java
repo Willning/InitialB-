@@ -22,8 +22,8 @@ public class Speedometer implements Disposable {
 
 	BasicCar car; 
 	//this will be measured for speed for the speedometer
-	SpriteBatch batch;
-	Stage stage;
+	private SpriteBatch batch;
+	private Stage stage;
 	private Viewport viewPort;
 	private Integer speed;	
 	private Long startTime;
@@ -36,6 +36,7 @@ public class Speedometer implements Disposable {
 	private AbstractTrack track;
 
 	private boolean GameOver;
+	private boolean started=false;
 	private boolean timerStop=false;
 
 
@@ -55,9 +56,7 @@ public class Speedometer implements Disposable {
 	}
 
 	private void createTimer(){
-		startTime=0l;
-		
-		startTimer();
+
 		time=new Label(String.format("%03d",0), new Label.LabelStyle(new BitmapFont(), Color.BLACK));		
 		time.setPosition(dial.getX()+20, 25);
 
@@ -95,21 +94,22 @@ public class Speedometer implements Disposable {
 
 	public void startTimer(){
 		startTime=TimeUtils.millis();
+		started=true;
 	}
 
 	public String stopTimer(){
 		if (!timerStop){
-		endTime=TimeUtils.millis();
-		timerStop=true;
+			endTime=TimeUtils.millis();
+			timerStop=true;
 		}
-		
+
 		//Now we can carry the time data over to the next screen
-		
+
 		long millis=(endTime-startTime)%1000;
 		long seconds=((endTime-startTime)/1000)%60;
 		long minutes=((endTime-startTime)/1000)/60;	
-		
-		
+
+
 		return String.format("Time: " +"%02d"+":"+ "%02d"+ ":"+"%03d", minutes, seconds, millis);
 	}
 
@@ -123,16 +123,17 @@ public class Speedometer implements Disposable {
 	}
 
 	public void update(){
-		
-		String timeData;
 
-		if (!GameOver){
-			timeData=stepTimer();
+		String timeData;
+		if(!started){
+			timeData=String.format("Time: " +"%02d"+":"+ "%02d"+ ":"+"%03d", 0,0,0);
 		}else{
-			timeData=stopTimer();
-			
+			if (!GameOver){
+				timeData=stepTimer();
+			}else{
+				timeData=stopTimer();
+			}
 		}
-		
 		time.setText(timeData);
 
 		speed=(int) (4.5*car.getForwardVelocity().len());		
@@ -144,7 +145,7 @@ public class Speedometer implements Disposable {
 		stage.draw();		
 
 	}
-	
+
 	public void gameOver(){
 		GameOver=true;
 	}
