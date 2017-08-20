@@ -52,7 +52,6 @@ public class Speedometer implements Disposable {
 		createSpeedo();
 		createTimer();
 
-
 	}
 
 	private void createTimer(){
@@ -148,6 +147,14 @@ public class Speedometer implements Disposable {
 
 	public void gameOver(){
 		GameOver=true;
+	}
+	
+	public boolean checkGameOver(){
+		return GameOver;
+	}
+	
+	public long getTimeLong(){
+		return (endTime-startTime);
 	}
 
 	@Override

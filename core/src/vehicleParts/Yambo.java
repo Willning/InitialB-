@@ -7,11 +7,9 @@ import com.badlogic.gdx.physics.box2d.World;
 public class Yambo extends FourWheelDriveCar{
 
 	public Yambo(World world, Vector2 location) {
-		super(world, location);
-		length=5f;
-		width=2f;		
+		super(world, location);		
 		sprite=new Texture("yambo.png");
-		maxTurnAngle=25;
+		maxTurnAngle=30;
 	}
 	
 	@Override
@@ -28,15 +26,21 @@ public class Yambo extends FourWheelDriveCar{
 	
 	
 	public void setDriveForce(){
-		driveForce=2000f;
+		driveForce=3000f;
 	}
 	
 	public void setMaxSpeed(){
-		maxSpeed=120f;
+		maxSpeed=200f;
 	}
 	
 	public void setMaxGrip(){
 		maxGrip=25f;
 	}
+	
+	public void setSize(){
+		length=5f;
+		width=2f;
+	}
+	
 
 }

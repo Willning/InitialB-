@@ -3,7 +3,7 @@ package vehicleParts;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 
-public class RearWheelDriveCar extends BasicCar{
+public class RearWheelDriveCar extends BasicCar implements Parameters{
 
 	public RearWheelDriveCar(World world, Vector2 location) {
 		super(world, location);

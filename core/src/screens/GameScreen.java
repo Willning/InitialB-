@@ -21,6 +21,7 @@ import gameLogic.CarRenderer;
 import gameLogic.GameManager;
 import gameLogic.InputController;
 import gameLogic.ListenerClass;
+import overlays.RaceEndOverlay;
 import overlays.Speedometer;
 import overlays.StarterLight;
 import trackStuff.BasicTrack;
@@ -48,20 +49,25 @@ public class GameScreen implements Screen {
 	private BasicCar car;
 	private Speedometer overlay;
 	private StarterLight starter;
+	private RaceEndOverlay end;
+	
 	private BasicTrack track;
-	ListenerClass listener;
+	private ListenerClass listener;
 
 	private CarRenderer renderer;
+	private CarList carType;
+	
 
 
-	private boolean timerStart=false;
+	private boolean timerStart=false;	
 	private boolean setStraight=false;
 
 	private float currentZoom=0.15f;
 
 	public GameScreen(final Game game, CarList setCar){
 		this.game=game;
-
+		this.carType=setCar;
+		
 		GameManager superGame =(GameManager)game;
 
 		batch = superGame.batcher;
@@ -88,13 +94,14 @@ public class GameScreen implements Screen {
 		//setup the controller
 
 		CarFactory factory=CarFactory.getInstance();
-		factory.setParams(world, new Vector2(40,20));		
+		factory.setParams(world, new Vector2(40,30));		
 		this.car=factory.makeCar(setCar);
 		//load the car from the factory, the input will be controlled by through the constructor which will take in a carList enum value from the choose car menu
 		track=new BasicTrack(world);
 
 		overlay=new Speedometer(car, batch,track);
 		starter=new StarterLight(batch);
+		end= new RaceEndOverlay(game, batch);
 		renderer=new CarRenderer(car,batch);
 		//Rendering of cars has now been pushed off onto another class, this means that we can potentially render two or more cars 
 
@@ -129,6 +136,7 @@ public class GameScreen implements Screen {
 		renderer.renderCar(camera, car);
 
 		renderOverlay();
+		starter.tick();
 
 	}
 
@@ -141,12 +149,16 @@ public class GameScreen implements Screen {
 			overlay.gameOver();
 		}
 		overlay.update();
+		
+		if(overlay.checkGameOver()){
+			end.setFinishDetails(carType, overlay.getTimeLong());
+			end.renderEnd(overlay.stopTimer());
+		}		
 	}
 
 
 	public void update(){
-		
-		starter.tick();
+
 		//used in render to handle game logic
 		if (!setStraight){
 			//Straighten car out here, not 100% neccesary but maybe use for resetting?
@@ -157,13 +169,12 @@ public class GameScreen implements Screen {
 		if (!timerStart&&starter.isStarted()){
 			//link this to gameStart later
 			overlay.startTimer();
-			timerStart=true;
+			timerStart=true;			
 		}
-
-
+		
 		world.step(Gdx.graphics.getDeltaTime(), 6, 2);
 		lerpCamera();
-		
+
 		if(starter.isStarted()){		
 			useHandler();
 		}
@@ -247,8 +258,12 @@ public class GameScreen implements Screen {
 		// TODO Auto-generated method stub
 
 	}
-
-
+	
+	//This method is to return what type of car has been used
+	public CarList getCar(){
+		return carType;
+	}
+	
 
 
 }

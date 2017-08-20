@@ -15,6 +15,7 @@ public class BasicCar{
 
 	//TODO add input logging and replaying, probably add a new controller.
 	//TODO add an engine class maybe so that power comes on and off progressively.
+	//TODO change the way hitboxes are created for different sized cars
 
 	protected float width=2;
 	protected float length=4.5f;	
@@ -55,6 +56,7 @@ public class BasicCar{
 		def.type=BodyDef.BodyType.DynamicBody;		
 		def.position.set(location);
 		
+		setSize();
 		
 		PolygonShape shape=new PolygonShape();
 		shape.setAsBox(width,length);
@@ -240,6 +242,10 @@ public class BasicCar{
 	
 	public void setMaxGrip(){
 		//override to set the grip of each tire.
+	}
+	
+	public void setSize(){
+		//override to set the dimensions of each car.
 	}
 
 

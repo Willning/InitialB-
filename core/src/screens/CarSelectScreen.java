@@ -2,11 +2,13 @@ package screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -24,16 +26,14 @@ public class CarSelectScreen extends AbstractScreen {
 
 	private Table table;
 	private CarList car;
-	private BitmapFont font;
+	private Label label;
 
 	GameManager superGame;
 
 	public CarSelectScreen(final Game racerGame){
 		this.game=racerGame;
 		superGame =(GameManager)game;
-		font= superGame.font;
-
-
+		
 		stage=new Stage();
 
 		Gdx.input.setInputProcessor(stage);
@@ -49,6 +49,7 @@ public class CarSelectScreen extends AbstractScreen {
 		TextButton buttonTwo=new TextButton ("EcoLancer", carSelectSkin);		
 		TextButton buttonThree=new TextButton("Bivic", carSelectSkin);
 		TextButton buttonFour=new TextButton("Yambo", carSelectSkin);
+		TextButton buttonFive=new TextButton("Abarth", carSelectSkin);
 		//Setup the buttons.
 
 		buttonOne.addListener(new ClickListener(){ 
@@ -79,18 +80,30 @@ public class CarSelectScreen extends AbstractScreen {
 				car=CarList.YAMBO;
 			}
 		});
+		
+		buttonFive.addListener(new ClickListener(){
+			@Override
+			public void clicked(InputEvent event, float x, float y){
+				car=CarList.ABARTH;
+			}
+		});
 
 
 		group.addActor(buttonOne);
 		group.addActor(buttonTwo);
 		group.addActor(buttonThree);
 		group.addActor(buttonFour);
+		group.addActor(buttonFive);
 
 		table.add(group);
 
 		stage.addActor(table);
 
 		makePlayAndBack();
+		
+		label=new Label(String.format("Car: "), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+		label.setPosition(500, 200);
+		stage.addActor(label);
 
 	}
 
@@ -126,15 +139,15 @@ public class CarSelectScreen extends AbstractScreen {
 		stage.addActor(playButton);
 	}
 
-	public void displayCurrentChoice(){
-
-		superGame.batcher.begin();
+	public void displayCurrentChoice(){		
+			
 		if (car!=null){
-			font.draw(superGame.batcher, "Car: " + car.toString(), 500, 200);
+			
+			label.setText("Car:" + car.toString());
 		}else{
-			font.draw(superGame.batcher, "Car: None Chosen", 500, 200);
-		}				
-		superGame.batcher.end();
+			label.setText("Car: None Chosen");
+		}		
+		
 
 	}
 
@@ -156,6 +169,7 @@ public class CarSelectScreen extends AbstractScreen {
 
 		stage.act();
 		stage.draw();
+		
 	}
 
 	@Override
@@ -188,8 +202,7 @@ public class CarSelectScreen extends AbstractScreen {
 		stage.dispose();
 		skin.dispose();
 		carSelectSkin.dispose();
-		font.dispose();
-
+		
 
 	}
 
