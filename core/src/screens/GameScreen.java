@@ -224,6 +224,7 @@ public class GameScreen implements Screen {
 
 		if (controller.drift){
 			car.drift();
+
 		}else{
 			car.unDrift();
 		}

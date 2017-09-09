@@ -18,7 +18,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import screens.GameEndScreen;
+import screens.HighScoreScreen;
 import screens.MainMenuScreen;
 import vehicleParts.CarFactory.CarList;
 
@@ -56,7 +56,7 @@ public class RaceEndOverlay implements Disposable {
 
 			@Override
 			public void clicked(InputEvent event, float x, float y){
-				game.setScreen(new GameEndScreen(game,carType,finishTime));
+				game.setScreen(new HighScoreScreen(game,carType,finishTime));
 				//TODO Change this to go to a new EndScreen later on
 			}
 
