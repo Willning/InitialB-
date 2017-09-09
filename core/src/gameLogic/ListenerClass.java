@@ -20,7 +20,7 @@ public class ListenerClass implements ContactListener{
 		
 		if (a.getUserData() instanceof String&&b.getUserData() instanceof String){
 			//Finish line works now.
-			System.out.println("finish");
+			
 			GameOver=true;
 		}
 

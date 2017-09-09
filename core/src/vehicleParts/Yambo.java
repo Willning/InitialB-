@@ -26,7 +26,7 @@ public class Yambo extends FourWheelDriveCar{
 	
 	
 	public void setDriveForce(){
-		driveForce=3000f;
+		driveForce=2500f;
 	}
 	
 	public void setMaxSpeed(){

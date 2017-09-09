@@ -98,6 +98,7 @@ public class GameScreen implements Screen {
 		this.car=factory.makeCar(setCar);
 		//load the car from the factory, the input will be controlled by through the constructor which will take in a carList enum value from the choose car menu
 		track=new BasicTrack(world);
+		//probably factory this
 
 		overlay=new Speedometer(car, batch,track);
 		starter=new StarterLight(batch);
