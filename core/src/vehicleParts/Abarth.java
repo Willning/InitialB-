@@ -9,7 +9,7 @@ public class Abarth extends FrontWheelDriveCar{
 	public Abarth(World world, Vector2 location) {
 		super(world, location);
 		maxTurnAngle=25;
-		sprite = new Texture("Abarth.png"); //TODO add an abarth sprite
+		sprite = new Texture("./Assets/Abarth.png"); 
 	}
 	
 	@Override

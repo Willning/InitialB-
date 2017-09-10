@@ -9,7 +9,7 @@ public class TownCar extends RearWheelDriveCar{
 	
 	public TownCar(World world, Vector2 location) {
 		super(world, location);
-		sprite=new Texture("townCar.png");
+		sprite=new Texture("./Assets/townCar.png");
 		maxTurnAngle=40;
 			
 	}

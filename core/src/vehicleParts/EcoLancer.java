@@ -8,7 +8,7 @@ public class EcoLancer extends FourWheelDriveCar {
 
 	public EcoLancer(World world, Vector2 location) {
 		super(world, location);
-		sprite=new Texture("ecoLancer.png");
+		sprite=new Texture("./Assets/ecoLancer.png");
 		maxTurnAngle=35;
 	}
 

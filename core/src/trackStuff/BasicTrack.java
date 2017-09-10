@@ -12,7 +12,8 @@ public class BasicTrack extends AbstractTrack{
 	public BasicTrack(World world){
 		//pass a reference from the world as well as a spritebatch from game
 		this.world=world;
-		track=new TmxMapLoader().load("basicTrack.tmx");		
+		track=new TmxMapLoader().load("./Assets/basicTrack.tmx");
+		//later on push this to a loader class. 
 		render=new OrthogonalTiledMapRenderer(track,1/2f);
 
 		extractCollisionObjects();
