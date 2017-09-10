@@ -8,17 +8,18 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import vehicleParts.CarFactory.CarList;
 
-public class CarTimeScreen extends AbstractScreen {
-
-	//New version of highscores where we just take each car and show its fastest time. 
+public class HighScoreScreen extends AbstractScreen {
+	//TODO Obselete class, delete later ons
 	
 	private final Game game;
 	
@@ -28,45 +29,65 @@ public class CarTimeScreen extends AbstractScreen {
 	private Skin textSkin;
 	
 	private Label postInfo;
-	private Label record;
+	
+	private TextField nameEntry;
+	private TextButton saveScore;
+	
 
 	private ShapeRenderer shapeColor;
 	private CarList car;
 	private long time; 
 	
-	public CarTimeScreen(Game game, CarList carChosen, Long timeTaken){
+	
+	
+	public HighScoreScreen(Game game, CarList carChoice, Long elapsedTime){
 		stage=new Stage();
 		createBasicSkin();
 		
 		this.game=game;
-		this.time=timeTaken;
-		this.car=carChosen;
+		this.time=elapsedTime;
+		this.car=carChoice;
 		this.prefs=Gdx.app.getPreferences("My Preferences");
 		
 		textSkin=new Skin(Gdx.files.internal("uiskin.json"));
 		
+		Gdx.input.setInputProcessor(stage);
 		
-		long oldTime=prefs.getLong(car.toString());
-		//takes the old time
-		
-		postInfo=new Label("Car: " + car.toString() +"  Time Taken "+ parseTime(time), textSkin);
+		postInfo=new Label("Car: " + carChoice.toString() +" Time Taken "+ parseTime(elapsedTime), textSkin);
 		postInfo.setColor(Color.WHITE);
 		postInfo.setPosition((int) Gdx.graphics.getWidth()/2-postInfo.getWidth()/2, (int) Gdx.graphics.getHeight()/2+190);
-		//info on top, add a record broken label later.
 		
-		if (time<oldTime || oldTime==0){
-			//if the new Time is faster or the oldTime doesn't exist, replace the old time
-			prefs.putLong(car.toString(), time);
-			record= new Label("New Record",textSkin);
-			record.setPosition((int) Gdx.graphics.getWidth()/2-record.getWidth()/2, (int) Gdx.graphics.getHeight()/2+170);
-			record.setColor(Color.RED);
-			stage.addActor(record);
-			prefs.flush();
-		}
+		nameEntry=new TextField("", textSkin);
+		nameEntry.setMessageText("Enter Name");
+		//change Location of NameEntry
+		nameEntry.setPosition((int) Gdx.graphics.getWidth()/2-nameEntry.getWidth()/2, (int) Gdx.graphics.getHeight()/2+150);
+		nameEntry.selectAll();
+		
+		saveScore=new TextButton("Save HighScore", textSkin);
+		saveScore.setPosition((int) Gdx.graphics.getWidth()/2-saveScore.getWidth()/2, (int) Gdx.graphics.getHeight()/2+110);
+		
+		saveScore.addListener(new ClickListener(){
+			@Override
+			public void clicked(InputEvent event, float x, float y){
+				
+				if (!nameEntry.getText().contains(" ")){
+				System.out.println(nameEntry.getText());
+				prefs.putLong(nameEntry.getText(), time);
+				prefs.putString(nameEntry.getText(), car.toString());
+				
+				prefs.flush();
+				//TODO, shift to table view of all highscores on click 
+				
+				}
+			}
+			
+		});
 		
 		stage.addActor(postInfo);
+		stage.addActor(nameEntry);
+		stage.addActor(saveScore);
 		
-		//TODO, add a table with all the cars
+	
 	}
 	
 	public String parseTime(long inputTime){
@@ -75,12 +96,14 @@ public class CarTimeScreen extends AbstractScreen {
 		long minutes=((inputTime)/1000)/60;	
 
 
-		return String.format("%02d"+":"+ "%02d"+ ":"+"%02d", minutes, seconds, millis);
+		return String.format("%02d"+":"+ "%02d"+ ":"+"%03d", minutes, seconds, millis);
 	}
-	
+
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
+		//called at the start
+		
+		
 		
 	}
 
@@ -91,7 +114,6 @@ public class CarTimeScreen extends AbstractScreen {
 		
 		stage.act();
 		stage.draw();
-		
 	}
 
 	@Override
