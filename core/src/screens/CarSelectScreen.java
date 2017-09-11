@@ -4,16 +4,18 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import gameLogic.GameManager;
+import trackStuff.TrackFactory.TrackList;
 import vehicleParts.CarFactory.CarList;
 
 public class CarSelectScreen extends AbstractScreen {
@@ -28,12 +30,17 @@ public class CarSelectScreen extends AbstractScreen {
 	private CarList car;
 	private Label label;
 
-	GameManager superGame;
+	private Texture texture;
+	private Image carPreview;
+	
+	private TrackList setTrack;
 
-	public CarSelectScreen(final Game racerGame){
+
+
+	public CarSelectScreen(final Game racerGame,TrackList setTrack){
 		this.game=racerGame;
-		superGame =(GameManager)game;
-		
+		this.setTrack=setTrack;
+
 		stage=new Stage();
 
 		Gdx.input.setInputProcessor(stage);
@@ -56,6 +63,7 @@ public class CarSelectScreen extends AbstractScreen {
 			@Override
 			public void clicked(InputEvent event, float x, float y){
 				car=CarList.TOWNCAR;
+				texture=new Texture("./Assets/Cars/townCar.png");
 			}
 		});
 
@@ -64,6 +72,7 @@ public class CarSelectScreen extends AbstractScreen {
 			@Override
 			public void clicked(InputEvent event, float x, float y){
 				car=CarList.ECOLANCER;
+				texture=new Texture("./Assets/Cars/ecoLancer.png");
 			}
 		});
 
@@ -71,25 +80,28 @@ public class CarSelectScreen extends AbstractScreen {
 			@Override
 			public void clicked(InputEvent event, float x, float y){
 				car=CarList.BIVIC;
+				texture=new Texture("./Assets/Cars/BondaBivic.png");
 			}
 		});
-		
+
 		buttonFour.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y){
 				car=CarList.YAMBO;
+				texture=new Texture("./Assets/Cars/yambo.png");
 			}
 		});
-		
+
 		buttonFive.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y){
 				car=CarList.ABARTH;
+				texture=new Texture("./Assets/Cars/Abarth.png");				
 			}
 		});
 
-
-		group.addActor(buttonOne);
+		group.space(10);
+		group.addActor(buttonOne);		
 		group.addActor(buttonTwo);
 		group.addActor(buttonThree);
 		group.addActor(buttonFour);
@@ -100,9 +112,9 @@ public class CarSelectScreen extends AbstractScreen {
 		stage.addActor(table);
 
 		makePlayAndBack();
-		
+
 		label=new Label(String.format("Car: "), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-		label.setPosition(500, 200);
+		label.setPosition((int) Gdx.graphics.getWidth()/2-label.getWidth()/2, (int) Gdx.graphics.getHeight()/2-220);
 		stage.addActor(label);
 
 	}
@@ -116,7 +128,7 @@ public class CarSelectScreen extends AbstractScreen {
 		backButton.addListener(new ClickListener(){
 			@Override
 			public void clicked(InputEvent event, float x, float y){
-				game.setScreen(new MainMenuScreen(game));
+				game.setScreen(new TrackSelectScreen(game));
 				dispose();
 			}
 		});
@@ -129,7 +141,7 @@ public class CarSelectScreen extends AbstractScreen {
 			@Override
 			public void clicked(InputEvent event, float x, float y){
 				if (car!=null){
-					game.setScreen(new GameScreen(game, car));
+					game.setScreen(new GameScreen(game, car, setTrack));
 					dispose();
 				}
 			}
@@ -140,17 +152,23 @@ public class CarSelectScreen extends AbstractScreen {
 	}
 
 	public void displayCurrentChoice(){		
-			
-		if (car!=null){
-			
+
+		if (car!=null){			
 			label.setText("Car:" + car.toString());
+
+			if (carPreview!=null){
+				carPreview.remove(); //clears the existing image if it exists before slapping down a new one
+			}
+			
+			carPreview=new Image(texture);			
+			carPreview.setPosition((int) Gdx.graphics.getWidth()/2-carPreview.getWidth()/2, (int) Gdx.graphics.getHeight()/2-180);
+			stage.addActor(carPreview);
 		}else{
 			label.setText("Car: None Chosen");
 		}		
-		
+
 
 	}
-
 
 
 
@@ -169,7 +187,7 @@ public class CarSelectScreen extends AbstractScreen {
 
 		stage.act();
 		stage.draw();
-		
+
 	}
 
 	@Override
@@ -202,7 +220,7 @@ public class CarSelectScreen extends AbstractScreen {
 		stage.dispose();
 		skin.dispose();
 		carSelectSkin.dispose();
-		
+
 
 	}
 

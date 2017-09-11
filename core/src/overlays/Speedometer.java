@@ -63,10 +63,10 @@ public class Speedometer implements Disposable {
 	}
 
 	private void createSpeedo(){
-		texture=new Texture("./Assets/dial.png");
+		texture=new Texture("./Assets/Overlays/dial.png");
 		dial= new Image(texture);
 
-		texture=new Texture("./Assets/needle.png");
+		texture=new Texture("./Assets/OverLays/needle.png");
 		needle=new Image(texture);		
 
 

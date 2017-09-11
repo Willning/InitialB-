@@ -24,7 +24,10 @@ import gameLogic.ListenerClass;
 import overlays.RaceEndOverlay;
 import overlays.Speedometer;
 import overlays.StarterLight;
+import trackStuff.AbstractTrack;
 import trackStuff.BasicTrack;
+import trackStuff.TrackFactory;
+import trackStuff.TrackFactory.TrackList;
 import vehicleParts.BasicCar;
 import vehicleParts.CarFactory;
 import vehicleParts.CarFactory.CarList;
@@ -51,11 +54,12 @@ public class GameScreen implements Screen {
 	private StarterLight starter;
 	private RaceEndOverlay end;
 	
-	private BasicTrack track;
+	private AbstractTrack track;
 	private ListenerClass listener;
 
 	private CarRenderer renderer;
 	private CarList carType;
+	private TrackList setTrack;
 	
 
 
@@ -64,9 +68,10 @@ public class GameScreen implements Screen {
 
 	private float currentZoom=0.15f;
 
-	public GameScreen(final Game game, CarList setCar){
+	public GameScreen(final Game game, CarList setCar, TrackList setTrack){
 		this.game=game;
 		this.carType=setCar;
+		this.setTrack=setTrack;
 		
 		GameManager superGame =(GameManager)game;
 
@@ -97,8 +102,16 @@ public class GameScreen implements Screen {
 		factory.setParams(world, new Vector2(40,30));		
 		this.car=factory.makeCar(setCar);
 		//load the car from the factory, the input will be controlled by through the constructor which will take in a carList enum value from the choose car menu
-		track=new BasicTrack(world);
-		//probably factory this
+		
+		TrackFactory trackMake=TrackFactory.getInstance();
+		
+		trackMake.setWorld(world);
+		//use the factory later.
+		
+		track= trackMake.makeTrack(setTrack);
+		
+		
+		//probably factory this, load the world into the singleTon Factory here and then use an enum
 
 		overlay=new Speedometer(car, batch,track);
 		starter=new StarterLight(batch);

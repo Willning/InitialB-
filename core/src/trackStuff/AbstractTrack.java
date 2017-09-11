@@ -35,6 +35,10 @@ public abstract class AbstractTrack {
 	protected Array<Body>startAndFinish=new Array<Body>();
 
 	protected ListenerClass listener;
+	
+	public AbstractTrack (World world){
+		this.world=world;
+	}
 
 	public void extractCollisionObjects(){
 		MapLayer layer = track.getLayers().get(1);

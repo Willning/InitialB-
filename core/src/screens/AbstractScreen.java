@@ -52,10 +52,9 @@ public abstract class AbstractScreen implements Screen{
 		TextButton.TextButtonStyle textButtonStyle=new TextButton.TextButtonStyle();		
 		
 		textButtonStyle.font = skin.getFont("default");
-		textButtonStyle.up = skin.newDrawable("background", Color.BLACK);
-		textButtonStyle.down = skin.newDrawable("background", Color.DARK_GRAY);
-		textButtonStyle.checked = skin.newDrawable("background", Color.BLACK);
-		textButtonStyle.over = skin.newDrawable("background", Color.BLACK);	
+		textButtonStyle.up = skin.newDrawable("background", Color.GRAY);
+		textButtonStyle.down = skin.newDrawable("background", Color.DARK_GRAY);		
+		textButtonStyle.over = skin.newDrawable("background", Color.DARK_GRAY);	
 		
 		carSelectSkin.add("default", textButtonStyle);
 		

@@ -17,7 +17,7 @@ public class CarFactory {
 
 	public static CarFactory getInstance() {
 		if(instance == null) {
-			instance = new CarFactory(world, location);
+			instance = new CarFactory();
 		}
 		return instance;
 	}
@@ -26,12 +26,9 @@ public class CarFactory {
 		this.world=world;
 		this.location=location;
 	}
-
-	private static CarFactory instant=null;
-
-	private CarFactory(World world, Vector2 location){
-		this.world=world;
-		this.location=location;
+	
+	private CarFactory(){
+		
 	}
 
 	public BasicCar makeCar(CarList car){

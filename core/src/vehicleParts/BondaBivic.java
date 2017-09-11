@@ -9,7 +9,7 @@ public class BondaBivic extends FrontWheelDriveCar {
 	public BondaBivic(World world, Vector2 location) {
 		super(world, location);
 		maxTurnAngle=25;
-		sprite=new Texture("./Assets/BondaBivic.png");
+		sprite=new Texture("./Assets/Cars/BondaBivic.png");
 						
 	}	
 	

@@ -8,7 +8,7 @@ public class Yambo extends FourWheelDriveCar{
 
 	public Yambo(World world, Vector2 location) {
 		super(world, location);		
-		sprite=new Texture("./Assets/yambo.png");
+		sprite=new Texture("./Assets/Cars/yambo.png");
 		maxTurnAngle=30;
 	}
 	

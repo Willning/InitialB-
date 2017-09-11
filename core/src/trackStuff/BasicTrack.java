@@ -9,10 +9,11 @@ public class BasicTrack extends AbstractTrack{
 	//TODO set objects as collisions, checkpoints and timing areas.
 
 
-	public BasicTrack(World world){
+	public BasicTrack(World world){	
+		super(world);
 		//pass a reference from the world as well as a spritebatch from game
-		this.world=world;
-		track=new TmxMapLoader().load("./Assets/basicTrack.tmx");
+		
+		track=new TmxMapLoader().load("./Assets/Tracks/basicTrack.tmx");
 		//later on push this to a loader class. 
 		render=new OrthogonalTiledMapRenderer(track,1/2f);
 
